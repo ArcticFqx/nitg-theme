@@ -1,0 +1,44 @@
+<ActorFrame><children>
+    <Quad
+        OnCommand="hidden,1;sleep,1/0;"
+    />
+    <Quad
+        OnCommand="hidden,0;xy,-100,-100;luaeffect,Update;"
+        UpdateCommand="%stx'lua.event'.Update"
+    />
+    <Quad  
+        OnCommand="hidden,1;"
+        StepP1LeftPressMessageCommand="%stx'lua.input'.Input ( 1, 1, true )"
+        StepP1LeftLiftMessageCommand="%stx'lua.input'.Input  ( 1, 1, false )"
+        StepP1DownPressMessageCommand="%stx'lua.input'.Input ( 1, 2, true )"
+        StepP1DownLiftMessageCommand="%stx'lua.input'.Input  ( 1, 2, false )"
+        StepP1UpPressMessageCommand="%stx'lua.input'.Input   ( 1, 3, true )" 
+        StepP1UpLiftMessageCommand="%stx'lua.input'.Input    ( 1, 3, false )"
+        StepP1RightPressMessageCommand="%stx'lua.input'.Input( 1, 4, true )"
+        StepP1RightLiftMessageCommand="%stx'lua.input'.Input ( 1, 4, false )"
+        StepP1MenuStartMessageCommand="%stx'lua.input'.Input ( 1, 5, true )"
+        StepP1MenuBackMessageCommand="%stx'lua.input'.Input  ( 1, 6, true )"
+
+        StepP2LeftPressMessageCommand="%stx'lua.input'.Input ( 2, 1, true )"
+        StepP2LeftLiftMessageCommand="%stx'lua.input'.Input  ( 2, 1, false )"
+        StepP2DownPressMessageCommand="%stx'lua.input'.Input ( 2, 2, true )"
+        StepP2DownLiftMessageCommand="%stx'lua.input'.Input  ( 2, 2, false )"
+        StepP2UpPressMessageCommand="%stx'lua.input'.Input   ( 2, 3, true )"
+        StepP2UpLiftMessageCommand="%stx'lua.input'.Input    ( 2, 3, false )"
+        StepP2RightPressMessageCommand="%stx'lua.input'.Input( 2, 4, true )"
+        StepP2RightLiftMessageCommand="%stx'lua.input'.Input ( 2, 4, false )"
+        StepP2MenuStartMessageCommand="%stx'lua.input'.Input ( 2, 5, true )"
+        StepP2MenuBackMessageCommand="%stx'lua.input'.Input  ( 2, 6, true )"
+    />
+    <Layer 
+        Name="Root"
+        Condition="stx'lua.geno'.Template(stx'lua.screen'.GetLayout())"
+        File="template.xml" 
+        InitCommand="%stx'lua.geno'.InitCmd"
+        OnCommand="%stx'lua.geno'.OnCmd"
+    />
+    <Quad 
+        Type="Quad"
+        InitCommand="%print"
+    />
+</children></ActorFrame>
