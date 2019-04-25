@@ -70,6 +70,8 @@ local layout = Def.ActorFrame {
         Text="",
         X = SCREEN_CENTER_X, Y = SCREEN_CENTER_Y+70,
         InitCommand=function(self)
+            
+            stitch "lua.keyboard" . Enable()
 
             event.Add("kb char", "readchar", function(c, spc)
                 local text = self:GetText()
