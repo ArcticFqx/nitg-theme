@@ -1,9 +1,0 @@
-<ActorFrame>
-  <children>
-		<Layer 
-      File="@stx('lua.geno').File(true)" 
-      InitCommand="%stx'lua.geno'.Register" 
-      Text="@stx'lua.geno'.Text()" 
-    />
-  </children>
-</ActorFrame>

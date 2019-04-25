@@ -35,6 +35,7 @@ local function init()
 
 end
 
+local logo = {}
 
 local layout = Def.ActorFrame {
     InitCommand = init,
@@ -52,6 +53,7 @@ local layout = Def.ActorFrame {
         File="/Graphics/nitglogo.png",
         X=SCREEN_CENTER_X+2, Y=SCREEN_CENTER_Y/2+2,
         InitCommand=function(self)
+            logo[1] = self
             self:zoom(SCREEN_HEIGHT/2/SCREEN_HEIGHT)
             self:diffusecolor (0,0,0,1)
             self:diffusealpha (0.5)
@@ -61,6 +63,7 @@ local layout = Def.ActorFrame {
         File="/Graphics/nitglogo.png",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2,
         InitCommand=function(self)
+            logo[2] = self
             self:zoom(SCREEN_HEIGHT/2/SCREEN_HEIGHT)
         end
     },
@@ -91,9 +94,33 @@ local layout = Def.ActorFrame {
             end)
         end
     },
-    Def.Audio{
-        File="/Music/dummy.wav",
+    Def.Audio {
+        File="dummy.wav",
         InitCommand=function(self)
+            local song = SONGMAN:GetRandomSong()
+            local prev = -1
+            local mod = 0
+            
+            event.Add("update", "song", function()
+                mod = math.mod(mod,10) + 1
+                local sp = self:get():GetSoundPosition()
+                local beat = 1+math.mod(song:GetBeatFromElapsedTime(sp or 0)+0.1,1)/10
+                local size = SCREEN_HEIGHT/2/SCREEN_HEIGHT*beat
+                logo[1]:zoom(size)
+                logo[2]:zoom(size)
+                if mod == 1 then -- rate limiting
+                    if sp == prev and sp ~= 0 then
+                        song = SONGMAN:GetRandomSong()
+                        self:load(song:GetMusicPath())
+                        self:start()
+                        prev = -1
+                    else
+                        prev = sp
+                    end
+                end
+            end)
+
+            self:load(song:GetMusicPath())
             self:start()
         end
     }
