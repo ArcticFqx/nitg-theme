@@ -3,42 +3,9 @@ local screen = stitch "lua.screen"
 local spc = stitch "lua.keyboard".special
 local buf = stitch "lua.keyboard".buffer
 
-local function init()
-    local byname = stitch("lua.geno").ActorByName
-
-    --byname.start:start()
-
-    local st = os.clock()
-    local startlen = 3.86
-
-    --[[
-    event.Add("update","initloop",function(t)
-
-        if (t-st) > startlen then
-            byname.loop:start()
-            event.Add("input",screen,function(key, press)
-                if press then
-                    --screen.SetNewScreen("Meow")
-                end
-            end)
-            local rs = byname.loop:get()
-            local bt = 60/125
-            event.Add("update","loop",function()
-                local a = math.mod((rs:GetSoundPosition()+bt)/bt,2)
-                byname.BG:diffusealpha(a<=1 and 0.5 or 1)
-            end)
-            byname.button:hidden(0)
-            event.Remove("update","initloop")
-        end
-    end)
-    ]]
-
-end
-
 local logo = {}
-
+local songName
 local layout = Def.ActorFrame {
-    InitCommand = init,
     Name="MainActorFrame",
     Def.Sprite{
         Name="BG",
@@ -94,13 +61,48 @@ local layout = Def.ActorFrame {
             end)
         end
     },
+    Def.Quad {
+        X=10, Y=10,
+        InitCommand="valign,1;x,SCREEN_CENTER_X;y,SCREEN_HEIGHT;zoomto,SCREEN_WIDTH,24;diffuse,0,0,0,0.5"
+    },
+    Def.BitmapText{
+        File="/Fonts/_lato stroke 48px [main]",
+        Text="!",
+        X = 30, Y = SCREEN_HEIGHT-6,
+        InitCommand=function(self) 
+            self:halign(0)
+            self:valign(1)
+            self:zoom(0.3)
+            songName = self
+        end
+    },
+    Def.Sprite {
+        File="/Graphics/note-48.png",
+        X = 4, Y = SCREEN_HEIGHT-4,
+        InitCommand=function(self) 
+            self:halign(0)
+            self:valign(1)
+            self:zoom(0.3)
+        end
+    },
     Def.Audio {
-        File="dummy.wav",
+        File="/Music/dummy.wav",
         InitCommand=function(self)
-            local song = SONGMAN:GetRandomSong()
-            local prev = -1
-            local mod = 0
+            local song
+            local prev
             
+            local function nextSong()
+                song = SONGMAN:GetRandomSong()
+                self:load(song:GetMusicPath())
+                self:start()
+                songName:settext(
+                    song:GetDisplayArtist() .. "  -  " ..
+                    song:GetDisplayMainTitle()
+                )
+                prev = -1
+            end
+
+            local mod = 0
             event.Add("update", "song", function()
                 mod = math.mod(mod,10) + 1
                 local sp = self:get():GetSoundPosition()
@@ -110,35 +112,22 @@ local layout = Def.ActorFrame {
                 logo[2]:zoom(size)
                 if mod == 1 then -- rate limiting
                     if sp == prev and sp ~= 0 then
-                        song = SONGMAN:GetRandomSong()
-                        self:load(song:GetMusicPath())
-                        self:start()
-                        prev = -1
+                        nextSong()
                     else
                         prev = sp
                     end
                 end
             end)
 
-            self:load(song:GetMusicPath())
-            self:start()
+            event.Add("input", "nextsong", function(c, p)
+                if c == "Right" and p then
+                    nextSong()
+                end
+            end)
+
+            nextSong()
         end
     }
-    --[[,,
-    Def.BitmapText{
-        File="/Fonts/_lato stroke 48px [main]",
-        Text="Press the any key to begin!",
-        X = SCREEN_CENTER_X, Y = SCREEN_CENTER_Y+170,
-        InitCommand="hidden,0"
-    }
-    Def.Audio{
-        File="/Music/titlestart.ogg",
-        Name="start"
-    },
-    Def.Audio{
-        File="/Music/titleloop.ogg",
-        Name="loop"
-    }]]
 }
 
 return layout
