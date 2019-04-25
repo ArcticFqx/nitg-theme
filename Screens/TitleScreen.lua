@@ -90,6 +90,12 @@ local layout = Def.ActorFrame {
                 end
             end)
         end
+    },
+    Def.Audio{
+        File="/Music/dummy.wav",
+        InitCommand=function(self)
+            self:start()
+        end
     }
     --[[,,
     Def.BitmapText{
