@@ -1,12 +1,12 @@
 <ActorFrame><children>
-    <Quad
+    <Layer
         OnCommand="hidden,1;sleep,1/0;"
     />
-    <Quad
+    <Layer
         OnCommand="hidden,0;xy,-100,-100;luaeffect,Update;"
         UpdateCommand="%stx'lua.event'.Update"
     />
-    <Quad  
+    <Layer  
         OnCommand="hidden,1;"
         StepP1LeftPressMessageCommand="%stx'lua.input'.Input ( 1, 1, true )"
         StepP1LeftLiftMessageCommand="%stx'lua.input'.Input  ( 1, 1, false )"
@@ -36,9 +36,5 @@
         File="template.xml" 
         InitCommand="%stx'lua.geno'.InitCmd"
         OnCommand="%stx'lua.geno'.OnCmd"
-    />
-    <Quad 
-        Type="Quad"
-        InitCommand="%print"
     />
 </children></ActorFrame>

@@ -29,9 +29,14 @@ local typespec = {
         Type = "BitmapText"
     },
     ActorFrameTexture = {
-        Init = function ( actor, template )
-            generic.Init( actor, template )
-        end
+        Type="ActorFrameTexture",
+        Init = generic.Init,
+        On = generic.On
+    },
+    Quad = {
+        Type="Quad",
+        Init = generic.Init,
+        On = generic.On
     }
 }
 
