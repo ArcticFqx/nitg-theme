@@ -18,7 +18,7 @@ local hecc = {
     "O-oooooooooo AAAAE-A-A-I-A-U- JO-oooooooooooo AAE-O-A-A-U-U-A- E-eee-ee-eee AAAAE-A-E-I-E-A- JO-ooo-oo-oo-oo EEEEO-A-AAA-AAAA",
     "osu!",
     "Powered by Ligma",
-    "I love video games. I REALLY love video games, like a lot! Like a WHOLE LOT! You have no video games."
+    "I love Video Games! Like a Video Game! Like a whole Video Game! You have no Video Game!!"
 }
 
 math.randomseed(tonumber(os.date("%S")))
