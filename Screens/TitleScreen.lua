@@ -5,6 +5,7 @@ local buf = stitch "lua.keyboard".buffer
 
 local logo = {}
 local songName
+local progBar
 local layout = Def.ActorFrame {
     Name="MainActorFrame",
     Def.Sprite{
@@ -38,9 +39,9 @@ local layout = Def.ActorFrame {
         Name="button",
         File="/Fonts/_eurostile outline",
         Text="",
-        X = SCREEN_CENTER_X, Y = SCREEN_CENTER_Y+70,
+        X = 10, Y = SCREEN_CENTER_Y,
         InitCommand=function(self)
-            
+            self:halign(0)
             stitch "lua.keyboard" . Enable()
 
             event.Add("kb char", "readchar", function(c, spc)
@@ -62,18 +63,46 @@ local layout = Def.ActorFrame {
         end
     },
     Def.Quad {
-        X=10, Y=10,
         InitCommand="valign,1;x,SCREEN_CENTER_X;y,SCREEN_HEIGHT;zoomto,SCREEN_WIDTH,24;diffuse,0,0,0,0.5"
+    },
+    Def.Quad {
+        X=0, Y=SCREEN_HEIGHT - 22,
+        InitCommand=function(self)
+            self:valign(1)
+            self:halign(0)
+            self:diffuse(0,0,0,0.7)
+            self:zoomto(SCREEN_WIDTH,2)
+        end
+    },
+    Def.Quad {
+        X=0, Y=SCREEN_HEIGHT - 22,
+        InitCommand=function(self)
+            self:valign(1)
+            self:halign(0)
+            self:diffuse(0,1,1,0.5)
+            self:zoomto(0,2)
+            progBar = self
+        end
     },
     Def.BitmapText{
         File="/Fonts/_lato stroke 48px [main]",
         Text="!",
-        X = 30, Y = SCREEN_HEIGHT-6,
+        X = 26, Y = SCREEN_HEIGHT-6,
         InitCommand=function(self) 
             self:halign(0)
             self:valign(1)
             self:zoom(0.3)
             songName = self
+        end
+    },
+    Def.Sprite {
+        File="/Graphics/note-48.png",
+        X = 8, Y = SCREEN_HEIGHT,
+        InitCommand=function(self) 
+            self:halign(0)
+            self:valign(1)
+            self:zoom(0.3)
+            self:diffuse(0,0,0,0.5)
         end
     },
     Def.Sprite {
@@ -115,6 +144,7 @@ local layout = Def.ActorFrame {
                 local size = SCREEN_HEIGHT/2/SCREEN_HEIGHT*beat
                 logo[1]:zoom(size)
                 logo[2]:zoom(size)
+                progBar:zoomto(sp/song:MusicLengthSeconds()*SCREEN_WIDTH,2)
                 if mod == 1 then -- rate limiting
                     if sp == prev and sp ~= 0 then
                         nextSong()
@@ -135,7 +165,7 @@ local layout = Def.ActorFrame {
 
             event.Add("input", "nextsong", function(c, p)
                 if c == "Right" and p then
-                    nextSong()
+                    --nextSong()
                 end
             end)
 
