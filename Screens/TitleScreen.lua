@@ -90,15 +90,20 @@ local layout = Def.ActorFrame {
         InitCommand=function(self)
             local song
             local prev
-            
+            local prevSong = ""
+            local curSong = ""
+
+            local function formatName(song)
+                return song:GetDisplayArtist() .. 
+                    "  -  " .. song:GetDisplayMainTitle()
+            end
+
             local function nextSong()
+                prevSong = song and formatName(song) or ""
                 song = SONGMAN:GetRandomSong()
                 self:load(song:GetMusicPath())
                 self:start()
-                songName:settext(
-                    song:GetDisplayArtist() .. "  -  " ..
-                    song:GetDisplayMainTitle()
-                )
+                curSong = formatName(song)
                 prev = -1
             end
 
@@ -115,6 +120,15 @@ local layout = Def.ActorFrame {
                         nextSong()
                     else
                         prev = sp
+                    end
+                end
+                sp = sp*3
+                if sp < 2.1 then
+                    if sp < 1 then
+                        songName:settext(string.sub(prevSong,0,string.len(prevSong)*(1-sp)))
+                    else
+                        sp = sp -1
+                        songName:settext(string.sub(curSong,0,string.len(curSong)*sp))
                     end
                 end
             end)
