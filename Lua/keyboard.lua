@@ -3,7 +3,9 @@ local event = stitch "lua.event"
 local keyboard = {}
 
 local layout = {
-    Norwegian = "nor"
+    Norwegian = "nor",
+    Qwertz,
+    QwertyUK
 }
 
 local lang = layout.Norwegian

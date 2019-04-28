@@ -16,6 +16,7 @@ function screen.SetNewScreen(name)
     currentScreen = name
     hasChanged = true
     sl,ls = ls,sl
+    event.Call("screen new", name)
     event.Reset()
     print("About to load", name, "with", sl .. ls)
     SCREENMAN:SetNewScreen(sl .. ls)

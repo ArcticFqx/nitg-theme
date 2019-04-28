@@ -119,8 +119,10 @@ function geno.File()
         return templatepath
     end
 
-    local rel = string.find(template.File, "^/") and "../" or ""
-    return rel .. template.File
+    if template.File then
+        local rel = string.find(template.File, "^/") and "../" or ""
+        return rel .. template.File
+    end
 end
 
 -- This runs third

@@ -42,6 +42,7 @@ local layout = Def.ActorFrame {
         X = 10, Y = SCREEN_CENTER_Y,
         InitCommand=function(self)
             self:halign(0)
+            self:valign(0)
             stitch "lua.keyboard" . Enable()
 
             event.Add("kb char", "readchar", function(c, spc)
