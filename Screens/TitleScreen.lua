@@ -17,6 +17,13 @@ local layout = Def.ActorFrame {
             self:diffusealpha(0.5)
         end
     },
+    Def.Sprite {
+        File="/Graphics/rainbow.jpg",
+        InitCommand=function ( self )
+            logo[3] = self
+            self:diffusealpha(0.5)
+        end
+    },
     Def.Sprite{
         File="/Graphics/nitglogo.png",
         X=SCREEN_CENTER_X+2, Y=SCREEN_CENTER_Y/2+2,
@@ -124,8 +131,8 @@ local layout = Def.ActorFrame {
             local curSong = ""
 
             local function formatName(song)
-                return song:GetDisplayArtist() .. 
-                    "  -  " .. song:GetDisplayMainTitle()
+                return song:GetTranslitArtist () .. 
+                    "  -  " .. song:GetTranslitMainTitle ()
             end
 
             local function nextSong()
@@ -134,6 +141,17 @@ local layout = Def.ActorFrame {
                 self:load(song:GetMusicPath())
                 self:start()
                 curSong = formatName(song)
+                local bg = song:GetBackgroundPath()
+                if bg then
+                    logo[3]:Load(bg)
+                    logo[3]:hidden(0)
+                    logo[3]:zoomto(SCREEN_WIDTH, SCREEN_HEIGHT)
+                    logo[3]:align(0,0)
+                else
+                    logo[3]:hidden(1)
+                end
+                print("Just played:", prevSong)
+                print("Now playing:", curSong)
                 prev = -1
             end
 
@@ -141,7 +159,7 @@ local layout = Def.ActorFrame {
             event.Add("update", "song", function()
                 mod = math.mod(mod,10) + 1
                 local sp = self:get():GetSoundPosition()
-                local beat = 1+math.mod(song:GetBeatFromElapsedTime(sp or 0)+0.1,1)/10
+                local beat = 1+math.mod(song:GetBeatFromElapsedTime(sp or 0)+0.11,1)/10
                 local size = SCREEN_HEIGHT/2/SCREEN_HEIGHT*beat
                 logo[1]:zoom(size)
                 logo[2]:zoom(size)
