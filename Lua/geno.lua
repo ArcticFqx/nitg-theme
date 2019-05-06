@@ -8,10 +8,7 @@ local templatepath = "template.xml"
     Geno is a library for creating screens in a similar way 
     to how SM5's Def tables work.
 
-    Source: https://github.com/ArcticFqx/nITGeno
-
-    This library is dependant on LibActor to function propperly,
-        see: https://github.com/ArcticFqx/LibActor
+    Part of the nitg-theme project: https://github.com/ArcticFqx/nitg-theme/
 ]]
 
 local geno = { 
