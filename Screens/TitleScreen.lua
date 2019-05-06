@@ -70,29 +70,6 @@ local function audioInit(self)
     nextSong()
 end
 
-local function bmtInit(self)
-    self:halign(0)
-    self:valign(0)
-    stitch "lua.keyboard" . Enable()
-
-    event.Add("kb char", "readchar", function(c, spc)
-        local text = self:GetText()
-        if c == "\n" and spc.ctrl then
-            self:settext("")
-            assert(loadstring(text))()
-        else
-            self:settext(text .. c)
-        end
-    end)
-
-    event.Add("kb special", "special", function(c)
-        local text = self:GetText()
-        if c == "backspace" then
-            self:settext(string.sub(text, 1, string.len(text) -1 ))
-        end
-    end)
-end
-
 return Def.ActorFrame {
     Name="MainActorFrame",
     Def.Sprite{ -- rainbow background
@@ -125,36 +102,27 @@ return Def.ActorFrame {
         Active=true,
         OnHover="linear,0.1;zoom,1.4",
         OnExit="linear,0.1;zoom,1",
-        Padding=20,
+        Padding=26,
+        Font="/Fonts/_lato stroke 48px [main]",
         UI.Button {
             Text = "Start Game",
-            File="/Fonts/_lato stroke 48px [main]",
             OnSelect = function (  )
-                print("Hello world")
+                stitch "lua.screen" . SetNewScreen "SongSelect"
             end
         },
         UI.Button {
-            Text = "Bye bye",
-            File="/Fonts/_lato stroke 48px [main]",
+            Text = "Lua Sandbox",
             OnSelect = function (  )
-                print("Second button")
+                stitch "lua.screen" . SetNewScreen "Sandbox"
             end
         },
         UI.Button {
             Text = "More options",
-            File="/Fonts/_lato stroke 48px [main]",
             OnSelect = function (  )
                 print("Third button")
             end
         }
-    },--[[
-    Def.BitmapText{ -- Lua scratch pad
-        Name="button",
-        File="/Fonts/_eurostile outline",
-        Text="",
-        X = 10, Y = SCREEN_CENTER_Y,
-        InitCommand=bmtInit
-    }, ]]
+    },
     Def.Quad { -- Song name field
         X=SCREEN_CENTER_X, Y=SCREEN_HEIGHT,
         InitCommand="valign,1;zoomto,SCREEN_WIDTH,24;diffuse,0,0,0,0.5"

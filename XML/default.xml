@@ -1,10 +1,15 @@
 <ActorFrame><children>
-    <Layer
+    <!--Layer
         OnCommand="hidden,1;sleep,1/0;"
-    />
+    /-->
     <Layer
         OnCommand="hidden,0;xy,-100,-100;luaeffect,Update;"
         UpdateCommand="%stx'lua.event'.Update"
+        UpdateOffMessageCommand="hidden,1"
+    />
+    <Layer
+        OnCommand="queuecommand,Screen"
+        ScreenCommand="%stx'lua.screen'.Check"
     />
     <Layer  
         OnCommand="hidden,1;"

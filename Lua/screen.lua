@@ -1,4 +1,4 @@
-local event = stx "lua.event"
+local event = stitch "lua.event"
 
 local screen = {}
 
@@ -6,7 +6,7 @@ local currentScreen = arg[1]
 -- Swap vars, loads either LuaScreen or ScreenLua
 local ls = "Lua"
 local sl = "Screen"
-
+local check = false
 function screen:Init( )
     print("Current screen is '" .. currentScreen .. "'")
     self:hidden(1)
@@ -17,9 +17,8 @@ function screen.SetNewScreen(name)
     hasChanged = true
     sl,ls = ls,sl
     event.Call("screen new", name)
-    event.Reset()
-    print("About to load", name, "with", sl .. ls)
-    SCREENMAN:SetNewScreen(sl .. ls)
+    MESSAGEMAN:Broadcast("UpdateOff")
+    check = true
 end
 
 function screen.GetLayout()
@@ -28,9 +27,9 @@ function screen.GetLayout()
         "screens." .. currentScreen .. ".default",
         "screens." .. currentScreen .. "." .. currentScreen
     }
-    local Def = {Def = stx("lua.geno").Def}
+    local Def = {Def = stitch("lua.geno").Def}
     for k,v in pairs(paths) do
-        local t = stx.RequireEnv(v, Def)
+        local t = stitch.nocache(v, Def)
         if t then
             return t
         end
@@ -41,6 +40,18 @@ end
 
 function screen:Overlay()
     stitch("lua.keyboard").Register(self)
+end
+
+function screen:Check( )
+    if check then
+        check = false
+        event.Reset()
+        print("About to load", currentScreen, "with", sl .. ls)
+        return SCREENMAN:SetNewScreen(sl .. ls)
+    end
+    self:sleep(0.1)
+    self:queuecommand("Screen")
+    
 end
 
 return screen

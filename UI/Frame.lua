@@ -6,7 +6,10 @@ local Def = geno.Def
 local function construct ( t )
     local af = Def.ActorFrame( t )
     af.UI = "Frame"
-    
+
+    for i,v in ipairs(t) do
+        v.File = t.Font
+    end
 
     local cursor = 1
     function af:InitCommand()

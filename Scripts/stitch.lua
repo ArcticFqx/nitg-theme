@@ -47,6 +47,24 @@ local function load(name)
     Debug(log[1])
 end
 
+function stitch.nocache( name, env, ... )
+    name = lower(name)
+    local func = load(name)
+    if not func then
+        return
+    end
+
+    env = env or {}
+    env.arg = arg
+
+    setfenv( func, setmetatable(
+        env,
+        { __index = _G, __newindex = _G }
+    ))
+
+    return func()
+end
+
 local requireCache = {}
 -- Require with a search path in your song directory, caches path hits and results
 function stitch.RequireEnv(name, env, ...)
