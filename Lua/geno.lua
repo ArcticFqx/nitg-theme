@@ -71,10 +71,6 @@ end
 
 smeta.__index = smeta
 
-local typeflags = {
-    actorframe = true
-}
-
 -- This runs first
 function geno.Cond(index, type)
     local s = stack:Top()
@@ -86,10 +82,6 @@ function geno.Cond(index, type)
     return true
 end
 
-local typepaths = {
-    actorframe = "template.xml"
-}
-
 function geno.Type()
     local s = stack:Top()
     if s.cd < s.depth then
@@ -97,6 +89,11 @@ function geno.Type()
     end
     s.i = s.i + 1
     local template = s.template[s.i]
+    if lower(template.Type) == "actorframe" then
+        if table.getn(template) > 0 then
+            return
+        end
+    end
     local spec = typespec[template.Type]
     return typespec[template.Type].Type
 end
@@ -114,9 +111,12 @@ function geno.File()
     local template = s.template[s.i]
 
     if lower(template.Type) == "actorframe" then
-        stack:NewLayer(template)
-        s.a[s.i] = stack:Top().a
-        return templatepath
+        if table.getn(template) > 0 then
+            stack:NewLayer(template)
+            s.a[s.i] = stack:Top().a
+            print("NewAF:", 0, "->", 1)
+            return templatepath
+        end
     end
 
     if template.File then
@@ -127,6 +127,7 @@ end
 
 -- This runs third
 function geno.Init(actor)
+    print("Geno::Initalize", actor)
     local s = stack:Top()
     
     if s.cd < 1 then
@@ -140,8 +141,11 @@ function geno.Init(actor)
             s.a[s.i] = actor
         end
         actorLookup[actor] = template
-        geno.ActorByName[template.Name or ""] = template.Name and actor
-        geno.NameByActor[actor] = template.Name
+        if template.Name then
+            geno.ActorByName[template.Name] = actor
+            geno.NameByActor[actor] = template.Name
+            actor:SetName(template.Name)
+        end
         typespec[template.Type].Init(actor, template)
     end
 

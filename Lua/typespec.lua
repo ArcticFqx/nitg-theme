@@ -37,6 +37,11 @@ local typespec = {
         Type="Quad",
         Init = generic.Init,
         On = generic.On
+    },
+    ActorFrame = {
+        Type="ActorFrame",
+        Init = generic.Init,
+        On = generic.On
     }
 }
 
