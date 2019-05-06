@@ -41,8 +41,7 @@ local function audioInit(self)
         local sp = self:get():GetSoundPosition()
         local beat = 1+math.mod(song:GetBeatFromElapsedTime(sp or 0)+0.11,1)/10
         local size = SCREEN_HEIGHT/2/SCREEN_HEIGHT*beat
-        names.logo1:zoom(size)
-        names.logo2:zoom(size)
+        names.logo:zoom(size)
         names.progbar:zoomto(sp/song:MusicLengthSeconds()*SCREEN_WIDTH,2)
         if mod == 1 then -- rate limiting
             if sp == prev and sp ~= 0 then
@@ -100,94 +99,94 @@ return Def.ActorFrame {
         Name="BG",
         File="/Graphics/rainbow.jpg",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
-        InitCommand=function(self)
-            self:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
-            self:diffusealpha(0.5)
-        end
+        InitCommand="zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffuse,0.7,0.7,0.7,1"
     },
     Def.Sprite { -- song background
         File="/Graphics/rainbow.jpg",
         Name="songbg",
-        InitCommand=function ( self )
-            self:diffusealpha(0.5)
-        end
+        InitCommand="diffuse,0.8,0.8,0.8,0.8"
     },
-    Def.Sprite{ -- nitg logo shadow
-        File="/Graphics/nitglogo.png",
-        X=SCREEN_CENTER_X+2, Y=SCREEN_CENTER_Y/2+2,
-        Name="logo1",
-        InitCommand=function(self)
-            self:zoom(SCREEN_HEIGHT/2/SCREEN_HEIGHT)
-            self:diffusecolor (0,0,0,1)
-            self:diffusealpha (0.5)
-        end
-    },
-    Def.Sprite{ -- nitg logo
-        File="/Graphics/nitglogo.png",
+    Def.ActorFrame{
+        Name="logo",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2,
-        Name="logo2",
-        InitCommand=function(self)
-            self:zoom(SCREEN_HEIGHT/2/SCREEN_HEIGHT)
-        end
+        InitCommand="zoom,SCREEN_HEIGHT/2/SCREEN_HEIGHT",
+        Def.Sprite{ -- nitg logo shadow
+            File="/Graphics/nitglogo.png",
+            X=3, Y=3,
+            InitCommand="diffuse,0,0,0,0.5"
+        },
+        Def.Sprite{ -- nitg logo
+            File="/Graphics/nitglogo.png",
+        }
     },
+    UI.Frame {
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
+        OnCommand="zoom,0.5",
+        Active=true,
+        OnHover="linear,0.1;zoom,1.4",
+        OnExit="linear,0.1;zoom,1",
+        Padding=20,
+        UI.Button {
+            Text = "Start Game",
+            File="/Fonts/_lato stroke 48px [main]",
+            OnSelect = function (  )
+                print("Hello world")
+            end
+        },
+        UI.Button {
+            Text = "Bye bye",
+            File="/Fonts/_lato stroke 48px [main]",
+            OnSelect = function (  )
+                print("Second button")
+            end
+        },
+        UI.Button {
+            Text = "More options",
+            File="/Fonts/_lato stroke 48px [main]",
+            OnSelect = function (  )
+                print("Third button")
+            end
+        }
+    },--[[
     Def.BitmapText{ -- Lua scratch pad
         Name="button",
         File="/Fonts/_eurostile outline",
         Text="",
         X = 10, Y = SCREEN_CENTER_Y,
         InitCommand=bmtInit
-    },
+    }, ]]
     Def.Quad { -- Song name field
-        InitCommand="valign,1;x,SCREEN_CENTER_X;y,SCREEN_HEIGHT;zoomto,SCREEN_WIDTH,24;diffuse,0,0,0,0.5"
+        X=SCREEN_CENTER_X, Y=SCREEN_HEIGHT,
+        InitCommand="valign,1;zoomto,SCREEN_WIDTH,24;diffuse,0,0,0,0.5"
     },
     Def.Quad { -- Prog bar shading
-        X=0, Y=SCREEN_HEIGHT - 22,
-        InitCommand=function(self)
-            self:valign(1)
-            self:halign(0)
-            self:diffuse(0,0,0,0.7)
-            self:zoomto(SCREEN_WIDTH,2)
-        end
+        Y=SCREEN_HEIGHT - 22,
+        InitCommand="align,0,1;diffuse,0,0,0,0.7;zoomto,SCREEN_WIDTH,2"
     },
     Def.Quad { -- Prog bar
-        X=0, Y=SCREEN_HEIGHT - 22,
         Name="progbar",
-        InitCommand=function(self)
-            self:valign(1)
-            self:halign(0)
-            self:diffuse(0,1,1,0.5)
-            self:zoomto(0,2)
-        end
+        Y=SCREEN_HEIGHT - 22,
+        InitCommand="align,0,1;diffuse,0,1,1,0.5;zoomto,0,2"
     },
     Def.BitmapText{ -- Song name
         Name="songname",
         File="/Fonts/_lato stroke 48px [main]",
         Text="!",
         X = 26, Y = SCREEN_HEIGHT-6,
-        InitCommand=function(self) 
-            self:halign(0)
-            self:valign(1)
-            self:zoom(0.3)
-        end
+        InitCommand="align,0,1;zoom,0.3"
     },
-    Def.Sprite { -- Note icon shadow
-        File="/Graphics/note-48.png",
-        X = 8, Y = SCREEN_HEIGHT,
-        InitCommand=function(self) 
-            self:halign(0)
-            self:valign(1)
-            self:zoom(0.3)
-            self:diffuse(0,0,0,0.5)
-        end
-    },
-    Def.Sprite { -- Note icon
-        File="/Graphics/note-48.png",
-        X = 4, Y = SCREEN_HEIGHT-4,
-        InitCommand=function(self) 
-            self:halign(0)
-            self:valign(1)
-            self:zoom(0.3)
-        end
+    Def.ActorFrame {
+        X=4, Y=SCREEN_HEIGHT-4,
+        InitCommand="zoom,0.3",
+        Def.Sprite { -- Note icon shadow
+            File="/Graphics/note-48.png",
+            X = 4/0.3, Y = 4/0.3,
+            InitCommand="align,0,1;diffuse,0,0,0,0.5"
+        },
+        Def.Sprite { -- Note icon
+            File="/Graphics/note-48.png",
+            InitCommand="align,0,1"
+        },
     },
     Def.Audio { -- Music
         File="/Music/dummy.wav",

@@ -15,7 +15,8 @@ local geno = {
     Actors = {}, 
     ActorByName = {}, 
     NameByActor = {},
-    TemplateByActor = {}
+    TemplateByActor = {},
+    ActorFrame = {}
 }
 
 local log = nodesPerAF == 10
@@ -24,7 +25,6 @@ local log = nodesPerAF == 10
                     return math.log(n)/math.log(nodesPerAF) 
                 end
 
-local actorLookup = {}
 local stack = {}
 
 local ceil = math.ceil
@@ -101,7 +101,7 @@ function geno.File()
 
     if s.cd < s.depth then
         s.cd = s.cd + 1
-        print("Depth:", s.cd-1, "->", s.cd)
+        print("Depth["..table.getn(stack).."]:", s.cd-1, "->", s.cd)
         return templatepath
     end
 
@@ -111,7 +111,7 @@ function geno.File()
         if table.getn(template) > 0 then
             stack:NewLayer(template)
             s.a[s.i] = stack:Top().a
-            print("NewAF:", 0, "->", 1)
+            print("NewAF["..table.getn(stack).."]:", 0, "->", 1)
             return templatepath
         end
     end
@@ -128,7 +128,9 @@ function geno.Init(actor)
     local s = stack:Top()
     
     if s.cd < 1 then
-        stack:Pop().a[0] = actor
+        s.a[0] = actor
+        geno.ActorFrame[actor] = s.a
+        stack:Pop()
         s = stack:Top()
     end
     local template = s.template[s.i]
@@ -137,7 +139,7 @@ function geno.Init(actor)
         if not s.a[s.i] then
             s.a[s.i] = actor
         end
-        actorLookup[actor] = template
+        geno.TemplateByActor[actor] = template
         if template.Name then
             geno.ActorByName[template.Name] = actor
             geno.NameByActor[actor] = template.Name
@@ -148,7 +150,7 @@ function geno.Init(actor)
 
     if s.l[s.cd] >= nodesPerAF or s.width <= s.i then
         s.cd = s.cd - 1
-        print("Depth:", s.cd+1, "->", s.cd)
+        print("Depth["..table.getn(stack).."]:", s.cd+1, "->", s.cd)
     end
 end
 
@@ -157,7 +159,7 @@ function geno.InitCmd(self)
     local s = stack:Top()
     local template = s.template
     geno.Actors[0] = self
-    actorLookup[self] = template
+    geno.TemplateByActor[self] = template
     typespec[template.Type].Init(self, template)
 end
 
@@ -168,10 +170,10 @@ function geno.OnCmd(_, a)
         if type(v) == "table" then
             geno.OnCmd(_, v)
         else
-            typespec[v].On(v, actorLookup[v])
+            typespec[v].On(v, geno.TemplateByActor[v])
         end
     end
-    typespec[a[0]].On(a[0], actorLookup[a[0]])
+    typespec[a[0]].On(a[0], geno.TemplateByActor[a[0]])
 end
 
 -- Called from Root
@@ -180,11 +182,12 @@ function geno.Template(template)
     geno.ActorByName = {}
     geno.NameByActor = {}
     geno.TemplateByActor = {}
+    geno.ActorFrame = {}
     stack = setmetatable({},smeta)
     stack:NewLayer(template)
     local s = stack:Top()
     s.a = geno.Actors
-    print("Depth:", s.cd-1, "->", s.cd)
+    print("Depth["..table.getn(stack).."]:", s.cd-1, "->", s.cd)
     return true
 end
 

@@ -1,4 +1,4 @@
-function runcommand(actor, template, kind)
+local function runcommand(actor, template, kind)
     local func = template[kind]
     if func then
         if type(func) == "string" then
