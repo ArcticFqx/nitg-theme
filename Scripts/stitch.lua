@@ -11,7 +11,7 @@ end
 
 local stitch = {
     _LAXVER = 'LibActor 0.5.0',
-    _VERSION = 'Stitch 190325 dev'
+    _VERSION = 'Stitch 190507 dev'
 }
 
 _G.stitch = stitch
