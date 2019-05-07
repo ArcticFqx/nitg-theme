@@ -15,21 +15,29 @@ local function audioInit(self)
             "  -  " .. song:GetTranslitMainTitle ()
     end
 
+    local fadebg = 1
     local function nextSong()
         prevSong = song and formatName(song) or ""
         song = SONGMAN:GetRandomSong()
         self:load(song:GetMusicPath())
         self:start()
         curSong = formatName(song)
-        local bg = song:GetBackgroundPath()
-        if bg then
-            names.songbg:Load(bg)
-            names.songbg:hidden(0)
-            names.songbg:zoomto(SCREEN_WIDTH, SCREEN_HEIGHT)
-            names.songbg:align(0,0)
+        local bg = song:GetBackgroundPath() or 
+                string.format("/Themes/%s/Graphics/rainbow.jpg",THEME:GetCurThemeName())
+
+        if fadebg > 1 then
+            names.bgfade:Load(bg)
+            names.bgfade:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
+            names.bgfade:linear(0.6)
+            names.bgfade:diffusealpha(1)
         else
-            names.songbg:hidden(1)
+            names.bgback:Load(bg)
+            names.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
+            names.bgfade:linear(0.6)
+            names.bgfade:diffusealpha(0)
         end
+        fadebg = math.mod(fadebg,2)+1
+
         print("Just played:", prevSong)
         print("Now playing:", curSong)
         prev = -1
@@ -73,15 +81,16 @@ end
 return Def.ActorFrame {
     Name="MainActorFrame",
     Def.Sprite{ -- rainbow background
-        Name="BG",
+        Name="bgback",
         File="/Graphics/rainbow.jpg",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
-        InitCommand="zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffuse,0.7,0.7,0.7,1"
+        InitCommand="diffuse,0.8,0.8,0.8,1"
     },
     Def.Sprite { -- song background
+        Name="bgfade",
         File="/Graphics/rainbow.jpg",
-        Name="songbg",
-        InitCommand="diffuse,0.8,0.8,0.8,0.8"
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
+        InitCommand="diffuse,0.8,0.8,0.8,0"
     },
     Def.ActorFrame{
         Name="logo",
@@ -97,7 +106,7 @@ return Def.ActorFrame {
         }
     },
     UI.Frame {
-        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
+        X=SCREEN_CENTER_X, Y=SCREEN_HEIGHT*3/5,
         OnCommand="zoom,0.5",
         Active=true,
         OnHover="linear,0.1;zoom,1.4",

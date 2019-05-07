@@ -29,12 +29,6 @@ local function bmtInit(self)
     end)
 end
 
-print()
-
-print()
-print()
-print("SANDBOX")
-print()
 return Def.ActorFrame {
     Name="MainActorFrame",
     Def.Sprite{ -- rainbow background
@@ -48,6 +42,6 @@ return Def.ActorFrame {
         File="/Fonts/_eurostile outline",
         Text="",
         X = 10, Y = 10,
-        InitCommand=bmtInit
+        OnCommand=bmtInit
     }
 }

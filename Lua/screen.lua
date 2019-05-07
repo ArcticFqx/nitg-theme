@@ -17,8 +17,8 @@ function screen.SetNewScreen(name)
     hasChanged = true
     sl,ls = ls,sl
     event.Call("screen new", name)
-    MESSAGEMAN:Broadcast("UpdateOff")
-    check = true
+    event.Reset()
+    SCREENMAN:SetNewScreen(sl .. ls)
 end
 
 function screen.GetLayout()
@@ -40,18 +40,6 @@ end
 
 function screen:Overlay()
     stitch("lua.keyboard").Register(self)
-end
-
-function screen:Check( )
-    if check then
-        check = false
-        event.Reset()
-        print("About to load", currentScreen, "with", sl .. ls)
-        return SCREENMAN:SetNewScreen(sl .. ls)
-    end
-    self:sleep(0.1)
-    self:queuecommand("Screen")
-    
 end
 
 return screen
