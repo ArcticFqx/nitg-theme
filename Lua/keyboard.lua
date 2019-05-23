@@ -29,7 +29,7 @@ keyboard.special = special
 local map = {
     nor = {
         remap = {
-            space = " ", enter = "\n", tab = "\t", 
+            space = " ", enter = "\n", tab = "    ", 
             ["`"] = "|", ["-"] = "+", ["["] = "å", ["]"] = "¨", ["\\"] = "'", [";"] = "ø", ["'"] = "æ", ["/"] = "-", ["="] = "\\"
         },
         shift = {

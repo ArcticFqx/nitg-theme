@@ -2,8 +2,16 @@ local event = stitch "lua.event"
 local screen = stitch "lua.screen"
 local UI = stitch "lua.ui"
 
+local function inrange(n, min, max)
+    return math.min(math.max(n,min),max)
+end
+
+local function modulo(a, b)
+    return a - math.floor(a / b) * b
+end
+
 local function audioInit(self)
-    local names = stitch "lua.geno" . ActorByName
+    local actors = stitch "lua.geno" . ActorByName
 
     local song
     local prev
@@ -11,8 +19,10 @@ local function audioInit(self)
     local curSong = ""
 
     local function formatName(song)
-        return song:GetTranslitArtist () .. 
-            "  -  " .. song:GetTranslitMainTitle ()
+        return string.format("%s  -  %s",
+            song:GetTranslitArtist(),
+            song:GetTranslitMainTitle()
+        )
     end
 
     local fadebg = 1
@@ -26,17 +36,17 @@ local function audioInit(self)
                 string.format("/Themes/%s/Graphics/rainbow.jpg",THEME:GetCurThemeName())
 
         if fadebg > 1 then
-            names.bgfade:Load(bg)
-            names.bgfade:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
-            names.bgfade:linear(0.6)
-            names.bgfade:diffusealpha(1)
+            actors.bgfade:Load(bg)
+            actors.bgfade:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
+            actors.bgfade:linear(0.6)
+            actors.bgfade:diffusealpha(1)
         else
-            names.bgback:Load(bg)
-            names.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
-            names.bgfade:linear(0.6)
-            names.bgfade:diffusealpha(0)
+            actors.bgback:Load(bg)
+            actors.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
+            actors.bgfade:linear(0.6)
+            actors.bgfade:diffusealpha(0)
         end
-        fadebg = math.mod(fadebg,2)+1
+        fadebg = modulo(fadebg,2)+1
 
         print("Just played:", prevSong)
         print("Now playing:", curSong)
@@ -45,12 +55,20 @@ local function audioInit(self)
 
     local mod = 0
     event.Add("update", "song", function()
-        mod = math.mod(mod,10) + 1
+        mod = modulo(mod,10) + 1
         local sp = self:get():GetSoundPosition()
-        local beat = 1+math.mod(song:GetBeatFromElapsedTime(sp or 0)+0.11,1)/10
-        local size = SCREEN_HEIGHT/2/SCREEN_HEIGHT*beat
-        names.logo:zoom(size)
-        names.progbar:zoomto(sp/song:MusicLengthSeconds()*SCREEN_WIDTH,2)
+        --print(sp, song:GetBeatFromElapsedTime(sp))
+        local bt = song:GetBeatFromElapsedTime(sp or 0)+0.11
+        local beat = modulo(bt,1)
+        local bs = 1+(beat^3)/10
+        local bac = inrange(beat*2.25, 0, 1)
+        local size = SCREEN_HEIGHT/2/SCREEN_HEIGHT
+
+        actors.logo:zoom(size*bs)
+        actors.logowave:zoom(size*(1+modulo(bac,1)/5))
+        actors.logowave:diffuse(1,1,1,bac == 0 and 0 or 1-bac)
+        actors.progbar:zoomto(sp/song:MusicLengthSeconds()*SCREEN_WIDTH,2)
+
         if mod == 1 then -- rate limiting
             if sp == prev and sp ~= 0 then
                 nextSong()
@@ -61,10 +79,10 @@ local function audioInit(self)
         sp = sp*3
         if sp < 2.1 then
             if sp < 1 then
-                names.songname:settext(string.sub(prevSong,0,string.len(prevSong)*(1-sp)))
+                actors.songname:settext(string.sub(prevSong,0,string.len(prevSong)*(1-sp)))
             else
                 sp = sp -1
-                names.songname:settext(string.sub(curSong,0,string.len(curSong)*sp))
+                actors.songname:settext(string.sub(curSong,0,string.len(curSong)*sp))
             end
         end
     end)
@@ -92,21 +110,26 @@ return Def.ActorFrame {
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
         InitCommand="diffuse,0.8,0.8,0.8,0"
     },
+    Def.Sprite{ -- nitg logo waves
+        File="/Graphics/notitg.png",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2+40,
+        Name="logowave"
+    },
     Def.ActorFrame{
         Name="logo",
-        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2,
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2+40,
         InitCommand="zoom,SCREEN_HEIGHT/2/SCREEN_HEIGHT",
         Def.Sprite{ -- nitg logo shadow
-            File="/Graphics/nitglogo.png",
+            File="/Graphics/notitg.png",
             X=3, Y=3,
             InitCommand="diffuse,0,0,0,0.5"
         },
         Def.Sprite{ -- nitg logo
-            File="/Graphics/nitglogo.png",
+            File="/Graphics/notitg.png",
         }
     },
     UI.Frame {
-        X=SCREEN_CENTER_X, Y=SCREEN_HEIGHT*3/5,
+        X=SCREEN_CENTER_X, Y=SCREEN_HEIGHT*3/5+30,
         OnCommand="zoom,0.5",
         Active=true,
         OnHover="linear,0.1;zoom,1.4",
@@ -166,7 +189,7 @@ return Def.ActorFrame {
         },
     },
     Def.Audio { -- Music
-        File="/Music/dummy.wav",
+        File="/Sounds/dummy.wav",
         InitCommand=audioInit
     }
 }

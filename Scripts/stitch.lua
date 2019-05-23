@@ -41,7 +41,7 @@ local function load(name)
         log[getn(log)+1] = '[Error] ' .. gsub(err,'\n.+','')
     end
 
-    for i=1, table.getn(log) do
+    for i=1, getn(log) do
         if not find(log[i], 'cannot read') then Debug(log[i]) return end
     end
     Debug(log[1])
