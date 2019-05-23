@@ -16,7 +16,8 @@ local geno = {
     ActorByName = {}, 
     NameByActor = {},
     TemplateByActor = {},
-    ActorFrame = {}
+    ActorFrame = {},
+    Overlay = {}
 }
 
 local log = nodesPerAF == 10
@@ -67,6 +68,19 @@ function smeta:NewLayer(t)
 end
 
 smeta.__index = smeta
+
+local isOverlay = false
+function geno.EnableOverlayMode()
+    isOverlay = true
+end
+
+function geno.RegisterOverlay(a)
+    local name = a:GetName() 
+    if name == "" then
+        name = table.getn(geno.Overlay)+1
+    end
+    geno.Overlay[name] = a
+end
 
 -- This runs first
 function geno.Cond(index, type)
@@ -144,6 +158,9 @@ function geno.Init(actor)
             geno.ActorByName[template.Name] = actor
             geno.NameByActor[actor] = template.Name
             actor:SetName(template.Name)
+        end
+        if isOverlay then
+            actor:queuecommand("RegisterOverlay")
         end
         typespec[template.Type].Init(actor, template)
     end

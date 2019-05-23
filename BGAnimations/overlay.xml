@@ -1,0 +1,13 @@
+<ActorFrame OnCommand="xy,0,0;zoom,1;">
+<children>
+    <Layer  
+        Name="Overlay"
+        File="template.xml" 
+
+        Condition="stx'lua.geno'.Template(stx'screens.overlay'),
+                   stx'lua.geno'.EnableOverlayMode()"
+        InitCommand="%function(a) stx'lua.geno'.InitCmd(a) end"
+        OnCommand="%function(a) stx'lua.geno'.OnCmd(a) end"
+    />
+</children>
+</ActorFrame>
