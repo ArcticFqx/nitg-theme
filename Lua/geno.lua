@@ -75,7 +75,6 @@ function geno.RegisterOverlay(a)
         name = table.getn(geno.Overlay)+1
     end
     geno.Overlay[name] = a
-    print("\n\n\n\n\n\n\n","Overlay registered", a, name)
 end
 
 -- This runs first

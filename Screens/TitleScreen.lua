@@ -10,8 +10,9 @@ local function modulo(a, b)
     return a - math.floor(a / b) * b
 end
 
-local function audioInit(self)
+local function audioInit()
     local actors = stitch "lua.geno" . ActorByName
+    local self = stitch "lua.geno" .Overlay.Music
 
     local song
     local prev
@@ -98,6 +99,7 @@ end
 
 return Def.ActorFrame {
     Name="MainActorFrame",
+    InitCommand=audioInit,
     Def.Sprite{ -- rainbow background
         Name="bgback",
         File="/Graphics/rainbow.jpg",
@@ -187,9 +189,5 @@ return Def.ActorFrame {
             File="/Graphics/note-48.png",
             InitCommand="align,0,1"
         },
-    },
-    Def.Audio { -- Music
-        File="/Sounds/dummy.wav",
-        InitCommand=audioInit
     }
 }
