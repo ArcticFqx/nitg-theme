@@ -21,7 +21,8 @@ local hecc = {
 math.randomseed(tonumber(os.date("%S")))
 math.random( 1, table.getn(hecc) )
 
-return string.format("NotITG %s  -  %s",
+return string.format("NotITG %s-%03d  -  %s",
     GAMESTATE:GetVersionDate(),
+    GetRevision(),
     hecc[math.random(1,table.getn(hecc))]
 )
