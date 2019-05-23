@@ -101,7 +101,9 @@ function geno.Type()
             return
         end
     end
-    local spec = typespec[template.Type]
+    if typespec[template.Type].Type then
+        template.Type = typespec[template.Type].Type
+    end
     return typespec[template.Type].Type
 end
 

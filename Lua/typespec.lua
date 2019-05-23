@@ -1,48 +1,45 @@
+local generic
+local typespec = {
+    ActorFrame = { Type="ActorFrame" },
+    Quad = { Type="Quad" },
+    BitmapText = {
+        Type = "BitmapText",
+        Init = function( actor, template )
+            actor:settext( template.Text or "" )
+            return generic.Init( actor, template )
+        end
+    },
+    Text = { Type="BitmapText" },
+    ActorFrameTexture = { Type="ActorFrameTexture" },
+    AFT = { Type="ActorFrameTexture" },
+    Polygon = { Type="Polygon" },
+    Poly = { Type="Polygon" },
+    ActorMultiVertex = { Type="Polygon" },
+    ActorSound = { Type="ActorSound" },
+    Sound = { Type="ActorSound" },
+    Audio = { Type="ActorSound" }
+}
+
+
 local function runcommand(actor, template, kind)
     local func = template[kind]
     if func then
         if type(func) == "string" then
             actor:cmd(func)
         elseif type(func) == "function" then
-            func(actor)
+            return func(actor)
         end
     end
 end
 
-local generic = {
+generic = {
     Init = function (actor, template)
         actor:xy(template.X or 0, template.Y or 0)
-        runcommand(actor, template, "InitCommand")
+        return runcommand(actor, template, "InitCommand")
     end,
     On = function (actor, template)
-        runcommand(actor, template, "OnCommand")
+        return runcommand(actor, template, "OnCommand")
     end
-}
-
-local typespec = {
-    BitmapText = {
-        Init = function( actor, template )
-            actor:settext( template.Text or "" )
-            generic.Init( actor, template )
-        end,
-        On = generic.On,
-        Type = "BitmapText"
-    },
-    ActorFrameTexture = {
-        Type="ActorFrameTexture",
-        Init = generic.Init,
-        On = generic.On
-    },
-    Quad = {
-        Type="Quad",
-        Init = generic.Init,
-        On = generic.On
-    },
-    ActorFrame = {
-        Type="ActorFrame",
-        Init = generic.Init,
-        On = generic.On
-    }
 }
 
 setmetatable( typespec, {
@@ -50,5 +47,10 @@ setmetatable( typespec, {
         return generic
     end
 })
+
+local tsmeta = { __index = generic }
+for _,v in pairs(typespec) do
+    setmetatable(v, tsmeta)
+end
 
 return typespec

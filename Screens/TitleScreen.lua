@@ -170,7 +170,7 @@ return Def.ActorFrame {
         Y=SCREEN_HEIGHT - 22,
         InitCommand="align,0,1;diffuse,0,1,1,0.5;zoomto,0,2"
     },
-    Def.BitmapText{ -- Song name
+    Def.Text{ -- Song name
         Name="songname",
         File="/Fonts/_lato stroke 48px [main]",
         Text="!",
