@@ -70,7 +70,8 @@ end
 smeta.__index = smeta
 
 function geno.RegisterOverlay(a)
-    local name = a:GetName() 
+    local name = a:GetName()
+    if name == "_" then return end
     if name == "" then
         name = table.getn(geno.Overlay)+1
     end
@@ -155,6 +156,8 @@ function geno.Init(actor)
             actor:SetName(template.Name)
         end
         typespec[template.Type].Init(actor, template)
+    else
+        actor:SetName("_")
     end
 
     if s.l[s.cd] >= nodesPerAF or s.width <= s.i then
