@@ -1,15 +1,15 @@
 <!-- Template XML for Geno, DO NOT EDIT or you will have a bad time -->
 <ActorFrame>
     <children>
-        <Layer Condition="stx'lua.geno'.Cond(1)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
-        <Layer Condition="stx'lua.geno'.Cond(2)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
-        <Layer Condition="stx'lua.geno'.Cond(3)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
-        <Layer Condition="stx'lua.geno'.Cond(4)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
-        <Layer Condition="stx'lua.geno'.Cond(5)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
-        <Layer Condition="stx'lua.geno'.Cond(6)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
-        <Layer Condition="stx'lua.geno'.Cond(7)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
-        <Layer Condition="stx'lua.geno'.Cond(8)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
-        <Layer Condition="stx'lua.geno'.Cond(9)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
-        <Layer Condition="stx'lua.geno'.Cond(10)" Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
+        <Layer Condition="stx'lua.geno'.Cond(1)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayMessageCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
+        <Layer Condition="stx'lua.geno'.Cond(2)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayMessageCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
+        <Layer Condition="stx'lua.geno'.Cond(3)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayMessageCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
+        <Layer Condition="stx'lua.geno'.Cond(4)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayMessageCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
+        <Layer Condition="stx'lua.geno'.Cond(5)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayMessageCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
+        <Layer Condition="stx'lua.geno'.Cond(6)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayMessageCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
+        <Layer Condition="stx'lua.geno'.Cond(7)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayMessageCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
+        <Layer Condition="stx'lua.geno'.Cond(8)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayMessageCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
+        <Layer Condition="stx'lua.geno'.Cond(9)"  Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayMessageCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
+        <Layer Condition="stx'lua.geno'.Cond(10)" Type="@stx'lua.geno'.Type()" File="@stx'lua.geno'.File()" InitCommand="%function(a) stx'lua.geno'.Init(a) end" RegisterOverlayMessageCommand="%function(a) stx'lua.geno'.RegisterOverlay(a) end" />
     </children>
 </ActorFrame>

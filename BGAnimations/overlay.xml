@@ -4,8 +4,7 @@
         Name="Overlay"
         File="template.xml" 
 
-        Condition="stx'lua.geno'.Template(stx'screens.overlay'),
-                   stx'lua.geno'.EnableOverlayMode()"
+        Condition="stx'lua.geno'.Template(stx'screens.overlay')"
         InitCommand="%function(a) stx'lua.geno'.InitCmd(a) end"
         OnCommand="%function(a) stx'lua.geno'.OnCmd(a) end"
     />
