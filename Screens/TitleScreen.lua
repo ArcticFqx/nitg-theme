@@ -3,6 +3,8 @@ local screen = stitch "lua.screen"
 local UI = stitch "lua.ui"
 local jukebox = stitch "lua.jukebox"
 
+local nobg = string.format("/Themes/%s/Graphics/rainbow.jpg",THEME:GetCurThemeName())
+
 local function inrange(n, min, max)
     return math.min(math.max(n,min),max)
 end
@@ -11,21 +13,30 @@ local function modulo(a, b)
     return a - math.floor(a / b) * b
 end
 
+local function checkBG(actor)
+    local tex = actor:GetTexture()
+    local swh = tex:GetTextureWidth() + tex:GetTextureHeight()
+    if swh < 32 then
+        actor:Load(nobg)
+    end
+end
+
 local function titleInit()
     local actors = stitch "lua.geno" . ActorByName
 
     local fadebg = 1
-    local nobg = string.format("/Themes/%s/Graphics/rainbow.jpg",THEME:GetCurThemeName())
     event.Add("jukebox next", "song", function()
         local bg = jukebox.GetSongBackground() or nobg
         fadebg = modulo(fadebg,2)+1
         if fadebg > 1 then
             actors.bgfade:Load(bg)
+            checkBG(actors.bgfade)
             actors.bgfade:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
             actors.bgfade:linear(0.6)
             actors.bgfade:diffusealpha(1)
         else
             actors.bgback:Load(bg)
+            checkBG(actors.bgback)
             actors.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
             actors.bgfade:linear(0.6)
             actors.bgfade:diffusealpha(0)
@@ -44,8 +55,8 @@ local function titleInit()
         actors.logowave:diffuse(1,1,1,bac == 0 and 0 or 1-bac)
     end)
     
-    local tex = actors.bgback:GetTexture()
     actors.bgback:Load(jukebox.GetSongBackground() or nobg)
+    checkBG(actors.bgback)
     actors.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
 end
 
