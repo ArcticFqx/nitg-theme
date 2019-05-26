@@ -1,9 +1,10 @@
-local geno = stitch "lua.geno"
-local Def = geno.Def
+local Def = stitch "lua.geno".Def
+
+local env = setmetatable({Def = Def},{__index = _G})
+local function overlay(name)
+    return stitch.RequireEnv("screens.overlay." .. name, env)
+end
 
 return Def.ActorFrame {
-    Def.Audio {
-        Name="Music",
-        File="/Sounds/dummy.wav"
-    }
+    overlay "music"
 }

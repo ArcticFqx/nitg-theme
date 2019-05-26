@@ -1,5 +1,11 @@
 <ActorFrame OnCommand="xy,0,0;zoom,1;">
 <children>
+    <Layer
+        RegisterOverlayMessageCommand="luaeffect,Update"
+        UpdateCommand="%function()
+            stx'lua.event'.Call('overlay update')
+        end"
+    />
     <Layer  
         Name="Overlay"
         File="template.xml" 

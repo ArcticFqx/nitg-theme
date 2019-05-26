@@ -17,7 +17,7 @@ local geno = {
     NameByActor = {},
     TemplateByActor = {},
     ActorFrame = {},
-    Overlay = {}
+    Overlay = { _ = "ignore", n = 0 }
 }
 
 local log = nodesPerAF == 10
@@ -71,10 +71,13 @@ smeta.__index = smeta
 
 function geno.RegisterOverlay(a)
     local name = a:GetName()
-    if name == "_" then return end
+    if geno.Overlay[name] then return end
     if name == "" then
-        name = table.getn(geno.Overlay)+1
+        geno.Overlay.n = geno.Overlay.n+1
+        name = tostring(geno.Overlay.n)
+        a:SetName(name)
     end
+    geno.Overlay[a] = name
     geno.Overlay[name] = a
 end
 
