@@ -59,8 +59,7 @@ end
 
 local function update()
     if isPlaying then
-        if  (sound:get():GetSoundPosition()+0.1) 
-            >= song:MusicLengthSeconds() then
+        if jukebox.SongPositions(0.2) >= song:MusicLengthSeconds() then
             if isAutoplay then
                 jukebox.NextSong()
             else

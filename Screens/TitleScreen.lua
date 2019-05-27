@@ -50,7 +50,8 @@ local function titleInit()
         local bac = inrange(beat*2.25, 0, 1)
         local size = SCREEN_HEIGHT/2/SCREEN_HEIGHT
 
-        actors.logo:zoom(size*bs)
+        actors.logoaft:zoom(size*bs)
+        actors.logotop:zoom(size*bs)
         actors.logowave:zoom(size*(1+modulo(bac,1)/5))
         actors.logowave:diffuse(1,1,1,bac == 0 and 0 or 1-bac)
     end)
@@ -58,22 +59,35 @@ local function titleInit()
     actors.bgback:Load(jukebox.GetSongBackground() or nobg)
     checkBG(actors.bgback)
     actors.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
+
+    local aft = actors.aft
+    local back = actors.aftspriteback
+    local front = actors.aftspritefront
+    local aftMult = 1
+
+    if tonumber(GAMESTATE:GetVersionDate()) >= 20170405 and string.find(string.lower(DISPLAY:GetVendor()), 'nvidia')
+    or string.find(string.lower(PREFSMAN:GetPreference('LastSeenVideoDriver')), 'nvidia') then
+        aftMult = 0.9 -- Setting the alpha multiplier to 0.9.
+    end
+    
+    aft:SetWidth(DISPLAY:GetDisplayWidth())
+    aft:SetHeight(DISPLAY:GetDisplayHeight())
+    aft:EnableAlphaBuffer(true)
+    aft:EnablePreserveTexture(true)
+    aft:Create()
+    
+    back:diffusealpha(0.95*aftMult)
+    back:SetTexture(aft:GetTexture())
+    front:SetTexture(aft:GetTexture())
 end
 
 return Def.ActorFrame {
     Name="MainActorFrame",
     InitCommand=titleInit,
-    Def.Sprite{ -- rainbow background
-        Name="bgback",
-        File="/Graphics/rainbow.jpg",
+    Def.Sprite {
+        File="/Graphics/white.png",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
-        InitCommand="diffuse,0.8,0.8,0.8,1"
-    },
-    Def.Sprite { -- song background
-        Name="bgfade",
-        File="/Graphics/rainbow.jpg",
-        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
-        InitCommand="diffuse,0.8,0.8,0.8,0"
+        InitCommand="zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffuse, 0.1,0.1,0.1,0.5"
     },
     Def.Sprite{ -- nitg logo waves
         File="/Graphics/notitg.png",
@@ -81,17 +95,54 @@ return Def.ActorFrame {
         Name="logowave"
     },
     Def.ActorFrame{
-        Name="logo",
+        Name="logoaft",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2+40,
         InitCommand="zoom,SCREEN_HEIGHT/2/SCREEN_HEIGHT",
-        Def.Sprite{ -- nitg logo shadow
+        Def.Sprite{ -- nitg logo
+            File="/Graphics/notitg.png",
+        }
+    },
+    Def.Sprite {
+        Name="aftspriteback",
+        File="/Graphics/white.png",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y+2.3,
+        InitCommand=[[  basezoomx,SCREEN_WIDTH/DISPLAY:GetDisplayWidth();
+                        basezoomy,-1*(SCREEN_HEIGHT/DISPLAY:GetDisplayHeight());
+                        zoom,1.025;]]
+    },
+    Def.ActorFrameTexture { Name="aft" },
+    Def.Sprite{ -- rainbow background
+        Name="bgback",
+        File="/Graphics/rainbow.jpg",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
+        --InitCommand="diffuse,0.8,0.8,0.8,1"
+    },
+    Def.Sprite { -- song background
+        Name="bgfade",
+        File="/Graphics/rainbow.jpg",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
+        InitCommand="diffuse,1,1,1,0"
+    },
+    Def.Sprite { 
+        Name="aftspritefront", 
+        File="/Graphics/white.png",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
+        InitCommand=[[  basezoomx,SCREEN_WIDTH/DISPLAY:GetDisplayWidth();
+                        basezoomy,-1*(SCREEN_HEIGHT/DISPLAY:GetDisplayHeight());
+                        zoom,1;]]
+    },
+    Def.ActorFrame{
+        Name="logotop",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2+40,
+        InitCommand="zoom,SCREEN_HEIGHT/2/SCREEN_HEIGHT",
+        Def.Sprite { -- nitg logo shadow
             File="/Graphics/notitg.png",
             X=3, Y=3,
             InitCommand="diffuse,0,0,0,0.5"
         },
-        Def.Sprite{ -- nitg logo
+        Def.Sprite { -- nitg logo
             File="/Graphics/notitg.png",
-        }
+        }   
     },
     UI.Frame {
         X=SCREEN_CENTER_X, Y=SCREEN_HEIGHT*3/5+50,
