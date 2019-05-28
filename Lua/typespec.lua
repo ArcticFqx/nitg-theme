@@ -1,9 +1,10 @@
 local generic
 local typespec = {
-    ActorFrame = { Type="ActorFrame" },
+    ActorFrame = { },
     Quad = { Type="Quad" },
     BitmapText = {
         Type = "BitmapText",
+        File = "_eurostile normal",
         Init = function( actor, template )
             actor:settext( template.Text or "" )
             return generic.Init( actor, template )
@@ -19,7 +20,6 @@ local typespec = {
     Sound = { Type="ActorSound" },
     Audio = { Type="ActorSound" }
 }
-
 
 local function runcommand(actor, template, kind)
     local func = template[kind]

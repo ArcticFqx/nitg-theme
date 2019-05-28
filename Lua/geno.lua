@@ -135,6 +135,8 @@ function geno.File()
         local rel = string.find(template.File, "^/") and "../" or ""
         return rel .. template.File
     end
+
+    return typespec[template.Type].File
 end
 
 -- This runs third
