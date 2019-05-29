@@ -153,7 +153,7 @@ return Def.ActorFrame {
         UI.Button {
             Text = "Start Game",
             OnSelect = function (  )
-                stitch "lua.screen" . SetNewScreen "Cutscene"
+                stitch "lua.screen" . SetNewScreen "Experiment"
             end
         },
         UI.Button {

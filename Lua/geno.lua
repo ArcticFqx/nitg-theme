@@ -32,7 +32,7 @@ local ceil = math.ceil
 local getn = table.getn
 local lower = string.lower
 
-local typespec = stx("lua.typespec")
+local typespec = stx("lua.geno.typespec")
 
 local function GetDepth(t)
     local depth = ceil(log(getn(t)))
