@@ -73,19 +73,12 @@ local function titleInit()
     checkBG(actors.bgback)
     actors.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
 
-    local aftMult = 1
-    if tonumber(GAMESTATE:GetVersionDate()) >= 20170405 and string.find(string.lower(DISPLAY:GetVendor()), 'nvidia')
-    or string.find(string.lower(PREFSMAN:GetPreference('LastSeenVideoDriver')), 'nvidia') then
-        aftMult = 0.9 -- Setting the alpha multiplier to 0.9.
-    end
-    
     aft:SetWidth(DISPLAY:GetDisplayWidth())
     aft:SetHeight(DISPLAY:GetDisplayHeight())
-    aft:EnableAlphaBuffer(true)
     aft:EnablePreserveTexture(true)
     aft:Create()
-    
-    actors.aftspriteback:diffusealpha(0.99*aftMult)--0.99*aftMult)
+
+    actors.aftspriteback:diffusealpha(0.9)
     actors.aftspriteback:SetTexture(aft:GetTexture())
     actors.aftspritefront:SetTexture(aft:GetTexture())
 end
@@ -96,7 +89,7 @@ return Def.ActorFrame {
     Def.Sprite {
         File="/Graphics/white.png",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
-        InitCommand="zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffuse, 0.1,0.1,0.1,0.5"
+        InitCommand="zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffuse, 0,0,0,1"
     },
     Def.Sprite { -- nitg logo
         Name="logowave",
@@ -121,13 +114,13 @@ return Def.ActorFrame {
         Name="bgback",
         File="/Graphics/rainbow.jpg",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
-        --InitCommand="diffuse,0.8,0.8,0.8,1"
+        InitCommand="diffuse,0.5,0.5,0.5,1"
     },
     Def.Sprite { -- song background
         Name="bgfade",
         File="/Graphics/rainbow.jpg",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
-        InitCommand="diffuse,1,1,1,0"
+        InitCommand="diffuse,0.5,0.5,0.5,0"
     },
     Def.Sprite { 
         Name="aftspritefront", 
@@ -136,6 +129,25 @@ return Def.ActorFrame {
         InitCommand=[[  basezoomx,SCREEN_WIDTH/DISPLAY:GetDisplayWidth();
                         basezoomy,-1*(SCREEN_HEIGHT/DISPLAY:GetDisplayHeight());
                         zoom,1;]]
+    },
+    Def.Shader {
+        Frag = [[
+            #version 120
+            uniform sampler2D sampler0;
+            varying vec2 textureCoord;
+            varying vec4 color;
+
+            void main (void)
+            {
+                vec4 t = texture2D( sampler0, textureCoord );
+                t.a = sqrt(pow(0.299*t.r,2)+pow(0.587*t.g,2)+pow(0.114*t.b,2))*2;
+                gl_FragColor = t*color;
+            }
+        ]],
+        InitCommand = function(self)
+            local as = stitch"lua.geno".ActorByName
+            as.aftspritefront:SetShader(self)
+        end
     },
     Def.Sprite { -- nitg logo
         Name="logotop",
