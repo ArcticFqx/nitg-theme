@@ -5,7 +5,6 @@ local UI = stitch "lua.ui"
 local function bmtInit(self)
     self:halign(0)
     self:valign(0)
-    stitch "lua.keyboard" . Enable()
 
     event.Add("kb char", "readchar", function(c, spc)
         local text = self:GetText()
@@ -27,6 +26,8 @@ local function bmtInit(self)
             stitch "lua.screen" . SetNewScreen "TitleScreen"
         end
     end)
+
+    self:zoom(0.5)
 end
 
 return Def.ActorFrame {

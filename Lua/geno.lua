@@ -140,13 +140,13 @@ function geno.File()
 end
 
 -- This runs third
-function geno.Init(actor)
-    print("Geno::Initalize", actor)
+function geno:Init()
+    print("Geno::Initalize", self)
     local s = stack:Top()
     
     if s.cd < 1 then
-        s.a[0] = actor
-        geno.ActorFrame[actor] = s.a
+        s.a[0] = self
+        geno.ActorFrame[self] = s.a
         stack:Pop()
         s = stack:Top()
     end
@@ -154,17 +154,17 @@ function geno.Init(actor)
 
     if s.cd == s.depth then
         if not s.a[s.i] then
-            s.a[s.i] = actor
+            s.a[s.i] = self
         end
-        geno.TemplateByActor[actor] = template
+        geno.TemplateByActor[self] = template
         if template.Name then
-            geno.ActorByName[template.Name] = actor
-            geno.NameByActor[actor] = template.Name
-            actor:SetName(template.Name)
+            geno.ActorByName[template.Name] = self
+            geno.NameByActor[self] = template.Name
+            self:SetName(template.Name)
         end
-        typespec[template.Type].Init(actor, template)
+        typespec[template.Type].Init(self, template)
     else
-        actor:SetName("_")
+        self:SetName("_")
     end
 
     if s.l[s.cd] >= nodesPerAF or s.width <= s.i then
@@ -174,11 +174,16 @@ function geno.Init(actor)
 end
 
 -- These runs at the very end when everything has been built
-function geno.InitCmd(self)
+function geno:InitCmd()
     local s = stack:Top()
     local template = s.template
     geno.Actors[0] = self
     geno.TemplateByActor[self] = template
+    if template.Name then
+        geno.ActorByName[template.Name] = self
+        geno.NameByActor[self] = template.Name
+        self:SetName(template.Name)
+    end
     typespec[template.Type].Init(self, template)
 end
 

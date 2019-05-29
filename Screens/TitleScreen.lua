@@ -5,7 +5,7 @@ local jukebox = stitch "lua.jukebox"
 
 local nobg = string.format("/Themes/%s/Graphics/rainbow.jpg",THEME:GetCurThemeName())
 
-local function inrange(n, min, max)
+local function clamp(n, min, max)
     return math.min(math.max(n,min),max)
 end
 
@@ -42,29 +42,38 @@ local function titleInit()
             actors.bgfade:diffusealpha(0)
         end
     end)
-
-    event.Add("update", "song", function()
+    
+    local aft = actors.aft
+    local oneFrame = 1/60
+    local lastClock = os.clock()+oneFrame
+    local hidden = true
+    event.Add("update", "song", function(t)
         local _, sb = jukebox.SongPositions(0.1)
         local beat = modulo(sb,1)
         local bs = 1+(beat^3)/10
-        local bac = inrange(beat*2.25, 0, 1)
+        local bac = clamp(beat*2.25, 0, 1)
         local size = SCREEN_HEIGHT/2/SCREEN_HEIGHT
 
         actors.logoaft:zoom(size*bs)
         actors.logotop:zoom(size*bs)
         actors.logowave:zoom(size*(1+modulo(bac,1)/5))
         actors.logowave:diffuse(1,1,1,bac == 0 and 0 or 1-bac)
+        
+        if t >= lastClock and hidden then
+            lastClock = t+oneFrame
+            hidden = false
+            aft:hidden(0)
+        elseif not hidden then
+            hidden = true
+            aft:hidden(1)
+        end
     end)
     
     actors.bgback:Load(jukebox.GetSongBackground() or nobg)
     checkBG(actors.bgback)
     actors.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
 
-    local aft = actors.aft
-    local back = actors.aftspriteback
-    local front = actors.aftspritefront
     local aftMult = 1
-
     if tonumber(GAMESTATE:GetVersionDate()) >= 20170405 and string.find(string.lower(DISPLAY:GetVendor()), 'nvidia')
     or string.find(string.lower(PREFSMAN:GetPreference('LastSeenVideoDriver')), 'nvidia') then
         aftMult = 0.9 -- Setting the alpha multiplier to 0.9.
@@ -76,9 +85,9 @@ local function titleInit()
     aft:EnablePreserveTexture(true)
     aft:Create()
     
-    back:diffusealpha(0.95*aftMult)
-    back:SetTexture(aft:GetTexture())
-    front:SetTexture(aft:GetTexture())
+    actors.aftspriteback:diffusealpha(0.99*aftMult)--0.99*aftMult)
+    actors.aftspriteback:SetTexture(aft:GetTexture())
+    actors.aftspritefront:SetTexture(aft:GetTexture())
 end
 
 return Def.ActorFrame {
@@ -89,18 +98,15 @@ return Def.ActorFrame {
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
         InitCommand="zoomto,SCREEN_WIDTH,SCREEN_HEIGHT;diffuse, 0.1,0.1,0.1,0.5"
     },
-    Def.Sprite{ -- nitg logo waves
+    Def.Sprite { -- nitg logo
+        Name="logowave",
         File="/Graphics/notitg.png",
-        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2+40,
-        Name="logowave"
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2+40
     },
-    Def.ActorFrame{
+    Def.Sprite{
         Name="logoaft",
-        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2+40,
-        InitCommand="zoom,SCREEN_HEIGHT/2/SCREEN_HEIGHT",
-        Def.Sprite{ -- nitg logo
-            File="/Graphics/notitg.png",
-        }
+        File="/Graphics/notitg.png",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2+40
     },
     Def.Sprite {
         Name="aftspriteback",
@@ -131,18 +137,10 @@ return Def.ActorFrame {
                         basezoomy,-1*(SCREEN_HEIGHT/DISPLAY:GetDisplayHeight());
                         zoom,1;]]
     },
-    Def.ActorFrame{
+    Def.Sprite { -- nitg logo
         Name="logotop",
-        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2+40,
-        InitCommand="zoom,SCREEN_HEIGHT/2/SCREEN_HEIGHT",
-        Def.Sprite { -- nitg logo shadow
-            File="/Graphics/notitg.png",
-            X=3, Y=3,
-            InitCommand="diffuse,0,0,0,0.5"
-        },
-        Def.Sprite { -- nitg logo
-            File="/Graphics/notitg.png",
-        }   
+        File="/Graphics/notitg.png",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y/2+40
     },
     UI.Frame {
         X=SCREEN_CENTER_X, Y=SCREEN_HEIGHT*3/5+50,
@@ -155,7 +153,7 @@ return Def.ActorFrame {
         UI.Button {
             Text = "Start Game",
             OnSelect = function (  )
-                stitch "lua.screen" . SetNewScreen "SongSelect"
+                stitch "lua.screen" . SetNewScreen "Cutscene"
             end
         },
         UI.Button {
