@@ -215,11 +215,18 @@ function geno.Template(template)
     return true
 end
 
+local defmeta = {}
+function defmeta:__call(append)
+    for _,v in ipairs(append) do
+        table.insert(self, v)
+    end
+end
+
 geno.Def = {}
 function geno.Def:__index(k)
     return function(t)
         t.Type = k
-        return t
+        return setmetatable(t, defmeta)
     end
 end
 setmetatable(geno.Def, geno.Def)

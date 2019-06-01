@@ -1,7 +1,5 @@
 local event = stitch "lua.event"
 
-local shader
-
 local function init(self)
     event.Add("input", "goback", function(k)
         if k == "Back" then 
@@ -10,12 +8,12 @@ local function init(self)
     end)
 end
 
-return Def.ActorFrame {
+local wow = Def.ActorFrame {
     InitCommand=init,
     Def.Sprite {
         Name="White",
         File="/Graphics/white.png",
-        InitCommand="diffuse,1,1,1,1;align,0,0;zoomto,100,100;"
+        InitCommand="align,0,0;zoomto,100,100;"
     },
     Def.Shader{
         Frag = [[
@@ -32,3 +30,12 @@ return Def.ActorFrame {
         end
     }
 }
+
+wow {
+    Def.Sprite {
+        File="/Graphics/note-48.png",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y
+    }
+}
+
+return wow
