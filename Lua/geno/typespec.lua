@@ -18,7 +18,6 @@ local typespec = {
             if template.Frag or template.Vert then
                 local vert = template.Vert or stitch "lua.geno.vert"
                 local frag = template.Frag or stitch "lua.geno.frag"
-                print("RECOMPILING", shader)
                 shader:compile(vert, frag)
             end
             local init = template.InitCommand
@@ -45,7 +44,9 @@ local typespec = {
     Sound = { Type = "ActorSound" },
     Audio = { Type = "ActorSound" },
     Actor = { Type = "Actor" },
-    Aux = { Type = "Actor" }
+    Aux = { Type = "Actor" },
+    Proxy = { Type = "ActorProxy" },
+    ActorProxy = { Type = "ActorProxy" }
 }
 
 local function runcommand(actor, template, kind)
