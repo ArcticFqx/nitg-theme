@@ -6,37 +6,42 @@ local unpack = unpack
 
 local subs = {}
 local persist = {}
-
-event.Running = false
+local remove = {}
+local stacksize = 0
 
 function event.Reset()
-    event.Running = false
     subs = {}
 end
 
 function event.Call(name, ...)
-    event.Running = true
-    if subs[name] then
-        for _, fn in pairs(subs[name]) do
-            if not event.Running then return end
-            local r = {fn(unpack(arg))}
-            if getn(r) > 0 then
-                event.Running = false
-                return unpack(r)
-            end
-        end
-    end
+    stacksize = stacksize+1
+
     if persist[name] then
         for _, fn in pairs(persist[name]) do
-            if not event.Running then return end
             local r = {fn(unpack(arg))}
             if getn(r) > 0 then
-                event.Running = false
                 return unpack(r)
             end
         end
     end
-    event.Running = false
+    if subs[name] then
+        for _, fn in pairs(subs[name]) do
+            local r = {fn(unpack(arg))}
+            if getn(r) > 0 then
+                return unpack(r)
+            end
+        end
+    end
+
+    stacksize = stacksize-1
+    if stacksize < 1 then
+        for key,tab in pairs(remove) do
+            for id in pairs(tab) do
+                persist[key][id] = nil
+                subs[key][id] = nil
+            end
+        end
+    end
 end
 
 function event.Add(name, id, fn)
@@ -49,13 +54,16 @@ function event.Persist(name, id, fn)
     persist[name][id] = fn
 end
 
+local function nop() end
 function event.Remove(name, id)
     if subs[name] then
-        subs[name][id] = nil
+        subs[name][id] = nop
     end
     if persist[name] then
-        persist[name][id] = nil
+        persist[name][id] = nop
     end
+    remove[name] = remove[name] or {}
+    remove[name][id] = true
 end
 
 local pt = os.clock()
