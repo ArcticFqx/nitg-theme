@@ -4,13 +4,13 @@ local typespec = {
         Type = "BitmapText",
         File = "_eurostile normal",
         Init = function( actor, template )
+            generic.Init( actor, template )
             actor:settext( template.Text or "" )
-            return generic.Init( actor, template )
         end
     },
     Shader = {
         File = "shader.xml",
-        Init = function(actor, template)
+        Init = function( actor, template )
             local dummy = actor:GetChild("shader")
             actor:hidden(1)
             dummy:hidden(1)
@@ -21,9 +21,17 @@ local typespec = {
                 print("RECOMPILING", shader)
                 shader:compile(vert, frag)
             end
-            return template.InitCommand(shader, template)
+            local init = template.InitCommand
+            if type(init) == "function" then
+                init( shader, template )
+            end
         end,
-        On = function() end
+        On = function(actor, template)
+            local on = template.OnCommand
+            if type(on) == "function" then
+                on( actor:GetChild("shader"):GetShader(), template )
+            end
+        end
     },
     ActorFrame = { },
     Quad = { Type = "Quad" },
