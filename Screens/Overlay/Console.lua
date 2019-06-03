@@ -60,7 +60,6 @@ local function ready(overlay)
     DevInput:xy(10,20+height*18*scale)
     DevBackground:zoomto(SCREEN_WIDTH, quadheight)
     DevConsole:y(-quadheight)
-    DevCursor:xy(10,25+height*19*scale)
 
     local function eval(code)
         local fn,err,erralt
