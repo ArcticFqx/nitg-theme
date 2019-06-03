@@ -7,13 +7,19 @@ local unpack = unpack
 local subs = {}
 local persist = {}
 local remove = {}
+local ignore = {}
 local stacksize = 0
 
 function event.Reset()
     subs = {}
 end
 
+function event.Ignore( name, bool )
+    ignore[name] = bool and true
+end
+
 function event.Call(name, ...)
+    if ignore[name] then return end
     stacksize = stacksize+1
 
     if persist[name] then
@@ -37,10 +43,15 @@ function event.Call(name, ...)
     if stacksize < 1 then
         for key,tab in pairs(remove) do
             for id in pairs(tab) do
-                persist[key][id] = nil
-                subs[key][id] = nil
+                if persist[key] then
+                    persist[key][id] = nil
+                end
+                if subs[key] then
+                    subs[key][id] = nil
+                end
             end
         end
+        remove = {}
     end
 end
 
@@ -66,12 +77,22 @@ function event.Remove(name, id)
     remove[name][id] = true
 end
 
+function event.Timer(time, fn)
+    local start = os.clock()
+    event.Add("update",fn,function(_,now)
+        if (now-start) >= time then
+            event.Remove("update",fn)
+            fn()
+        end
+    end)
+end
+
 local pt = os.clock()
 function event:Update()
     local time = os.clock()
     local dt = time - pt
     pt = time
-    event.Call("update", time, dt)
+    event.Call("update", dt, time)
 end
 
 return event

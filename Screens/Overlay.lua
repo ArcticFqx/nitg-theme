@@ -6,5 +6,8 @@ local function overlay(name)
 end
 
 return Def.ActorFrame {
-    overlay "music"
+    overlay "music",
+    overlay "clock",
+    overlay "escape",
+    overlay "console"
 }

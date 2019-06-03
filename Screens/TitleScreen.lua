@@ -109,7 +109,9 @@ return Def.ActorFrame {
                         basezoomy,-1*(SCREEN_HEIGHT/DISPLAY:GetDisplayHeight());
                         zoom,1.025;]]
     },
-    Def.ActorFrameTexture { Name="aft" },
+    Def.ActorFrameTexture { 
+        Name="aft" 
+    },
     Def.Sprite{ -- rainbow background
         Name="bgback",
         File="/Graphics/rainbow.jpg",
