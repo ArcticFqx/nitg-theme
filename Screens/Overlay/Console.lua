@@ -50,6 +50,7 @@ local function ready(overlay)
     local function show(s)
         if string.len(s) <= 0 then return end
         append(s)
+        if s == "> " then return end
         print(s)
     end
 
