@@ -5,7 +5,6 @@ local function ready(overlay)
     local DevBuffer = overlay.DevBuffer
     local DevConsole = overlay.DevConsole
     local DevInput = overlay.DevInput
-    local DevLen = overlay.DevLen
     local DevBackground = overlay.DevBackground
     
     local buffer = {"","","","","","","","","","","","","","",""}
@@ -48,12 +47,50 @@ local function ready(overlay)
         append(table.concat(arg,"  "))
     end
 
+    local function show(s)
+        if string.len(s) <= 0 then return end
+        append(s)
+        print(s)
+    end
+
+
     local height = DevBuffer:GetHeight()
     local quadheight = 10+height*20*scale
     DevBuffer:xy(10,10+height*17*scale)
     DevInput:xy(10,20+height*18*scale)
     DevBackground:zoomto(SCREEN_WIDTH, quadheight)
     DevConsole:y(-quadheight)
+    DevCursor:xy(10,25+height*19*scale)
+
+    local function eval(code)
+        local fn,err,erralt
+        fn, err = loadstring(
+            string.format("return (function(...) return arg end)(%s)",code),"Console")
+        if not fn then
+            fn, erralt = loadstring(code,"Console")
+        end
+        err = erralt or err
+        if fn then
+            local ret = {pcall(
+                function()
+                    return (function(...)
+                        return arg
+                    end)(fn())
+                end
+            )}
+            if ret[1] then
+                print(err and "Has err" or "blank")
+                return err and ret[2] or ret[2][1]
+            else
+                err = ret[2]
+            end
+        end
+
+        if err then
+            err = "error: " .. string.gsub(err,"^.-:1: ","")
+            show(err)
+        end
+    end
 
     event.Persist("kb char","dev console",function(char)
         if char ~= "|" then return end
@@ -82,7 +119,18 @@ local function ready(overlay)
                 local text = DevInput:GetText()
                 if char == "\n" then
                     DevInput:settext("")
-                    assert(loadstring(text))()
+                    show("> " .. text)
+                    local res = eval(text)
+                    if res then
+                        if type(res) == "table" then
+                            for i=1,res.n or table.getn(res) do
+                                res[i] = tostring(res[i])
+                            end
+                            show(table.concat(res,"  "))
+                        else
+                            show(tostring(res))
+                        end
+                    end
                 else
                     DevInput:settext(text .. char)
                 end
@@ -107,7 +155,7 @@ return Def.ActorFrame {
     },
     Def.Text {
         Name = "DevBuffer",
-        InitCommand = "align,0,1;zoom," .. scale,
+        InitCommand = "align,0,1;diffuse,0.9,1,0.9,1;zoom," .. scale,
         File = "/Fonts/_eurostile outline",
         Text = "|"
     },
@@ -115,14 +163,5 @@ return Def.ActorFrame {
         Name = "DevInput",
         File = "/Fonts/_eurostile outline",
         InitCommand = "align,0,1;zoom," .. scale
-    },
-    Def.Text {
-        Name = "DevLen",
-        File = "/Fonts/_eurostile outline",
-        InitCommand = "diffusealpha,0;zoom," .. scale
-    },
-    Def.Quad {
-        Name = "DevCursor",
-        InitCommand = "align,0,1"
     }
 }

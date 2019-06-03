@@ -9,6 +9,7 @@ local persist = {}
 local remove = {}
 local ignore = {}
 local stacksize = 0
+local hasRemove = false
 
 function event.Reset()
     subs = {}
@@ -40,7 +41,7 @@ function event.Call(name, ...)
     end
 
     stacksize = stacksize-1
-    if stacksize < 1 then
+    if stacksize < 1 and hasRemove then
         for key,tab in pairs(remove) do
             for id in pairs(tab) do
                 if persist[key] then
@@ -52,6 +53,7 @@ function event.Call(name, ...)
             end
         end
         remove = {}
+        hasRemove = false
     end
 end
 
@@ -75,6 +77,7 @@ function event.Remove(name, id)
     end
     remove[name] = remove[name] or {}
     remove[name][id] = true
+    hasRemove = true
 end
 
 function event.Timer(time, fn)
