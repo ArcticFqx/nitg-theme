@@ -78,7 +78,6 @@ local function ready(overlay)
                 end
             )}
             if ret[1] then
-                print(err and "Has err" or "blank")
                 return err and ret[2] or ret[2][1]
             else
                 err = ret[2]
