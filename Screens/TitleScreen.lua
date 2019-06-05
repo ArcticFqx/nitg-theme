@@ -28,6 +28,7 @@ local function titleInit()
     event.Add("jukebox next", "song", function()
         local bg = jukebox.GetSongBackground() or nobg
         fadebg = modulo(fadebg,2)+1
+        actors.bgfade:finishtweening()
         if fadebg > 1 then
             actors.bgfade:Load(bg)
             checkBG(actors.bgfade)
@@ -41,6 +42,13 @@ local function titleInit()
             actors.bgfade:linear(0.6)
             actors.bgfade:diffusealpha(0)
         end
+        event.Timer(1,function()
+            if fadebg > 1 then
+                actors.bgback:Load(nobg)
+            else
+                actors.bgfade:Load(nobg)
+            end
+        end)
     end)
     
     local aft = actors.aft
@@ -81,6 +89,12 @@ local function titleInit()
     actors.aftspriteback:diffusealpha(0.9)
     actors.aftspriteback:SetTexture(aft:GetTexture())
     actors.aftspritefront:SetTexture(aft:GetTexture())
+
+    local af = stitch("lua.geno").ActorByName
+    function stop()
+        af.movie:play()
+        af.stop:start()
+    end
 end
 
 return Def.ActorFrame {
@@ -116,13 +130,13 @@ return Def.ActorFrame {
         Name="bgback",
         File="/Graphics/rainbow.jpg",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
-        InitCommand="diffuse,0.5,0.5,0.5,1"
+        InitCommand="diffuse,0.7,0.7,0.7,1"
     },
     Def.Sprite { -- song background
         Name="bgfade",
         File="/Graphics/rainbow.jpg",
         X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
-        InitCommand="diffuse,0.5,0.5,0.5,0"
+        InitCommand="diffuse,0.7,0.7,0.7,0"
     },
     Def.Sprite { 
         Name="aftspritefront", 

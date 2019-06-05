@@ -85,10 +85,7 @@ local function ready(overlay)
             end
         end
 
-        if err then
-            err = "error: " .. string.gsub(err,"^.-:1: ","")
-            show(err)
-        end
+        show(string.gsub(err,"^.-:1: ","error: "))
     end
 
     event.Persist("kb char","dev console",function(char)
