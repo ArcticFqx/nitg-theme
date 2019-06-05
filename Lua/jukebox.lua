@@ -58,17 +58,17 @@ local vid = {
 }
 function jukebox.GetSongBackground()
     local bg = song:GetBackgroundPath()
-    local vid = false
+    local isvid = false
     if bg then
         local folder = string.sub(bg,string.find(bg,".+/"))
         for _,v in ipairs({GAMESTATE:GetFileStructure(folder)}) do
             if vid[string.lower(string.gsub(v,".+%.",""))] then
                 bg = folder .. v
-                vid = true
+                isvid = true
             end
         end
     end
-    return bg, vid
+    return bg, isvid
 end
 
 local function update()
