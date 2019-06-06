@@ -88,12 +88,6 @@ local function titleInit()
 
     actors.aftspriteback:diffusealpha(0.9):SetTexture(aft:GetTexture())
     actors.aftspritefront:SetTexture(aft:GetTexture())
-
-    local af = stitch("lua.geno").ActorByName
-    function stop()
-        af.movie:play()
-        af.stop:start()
-    end
 end
 
 return Def.ActorFrame {
@@ -195,37 +189,5 @@ return Def.ActorFrame {
                 print("Third button")
             end
         }
-    },
-    Def.Sprite {
-        Name="movie",
-        File="/Graphics/stop.mpg",
-        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
-        InitCommand="pause"
-    },
-    Def.Shader {
-        Frag = [[
-            #version 120
-            uniform sampler2D sampler0;
-            varying vec2 textureCoord;
-            varying vec4 color;
-
-            void main (void)
-            {
-                vec4 t = texture2D( sampler0, textureCoord );
-                if (t.r < 0.5 && t.g > 0.6 && t.b < 0.4){
-                    t.a = 0;
-                }
-                gl_FragColor = t*color;
-            }
-        ]],
-        InitCommand = function( shader )
-            local movie = stitch("lua.geno").ActorByName.movie
-            movie:SetShader(shader)
-        end
-    },
-    Def.Sound {
-        Name="stop",
-        File="/Sounds/stop.ogg",
-        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y
     }
 }
