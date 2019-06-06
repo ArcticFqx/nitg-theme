@@ -54,6 +54,13 @@ local function ready(overlay)
         print(s)
     end
 
+    local function printtable(t)
+        show("{")
+        for k,v in pairs(t) do
+            show("  " .. tostring(k) .. " = " .. tostring(v))
+        end
+        show("}")
+    end
 
     local height = DevBuffer:GetHeight()
     local quadheight = 10+height*20*scale
@@ -94,8 +101,8 @@ local function ready(overlay)
         event.Ignore("input", enabled)
         DevConsole:finishtweening()
         if not enabled then
-            DevConsole:accelerate (0.3)
-            DevConsole:y(-quadheight)
+            DevConsole  :accelerate (0.3)
+                        :y(-quadheight)
             event.Timer(0.4,function()
                 if enabled then return end
                 DevConsole:hidden(1)
@@ -107,9 +114,9 @@ local function ready(overlay)
         end
 
         DevBuffer:settext(table.concat(buffer,"\n"))
-        DevConsole:visible(1)
-        DevConsole:decelerate(0.3)
-        DevConsole:y(0)
+        DevConsole  :visible(1)
+                    :decelerate(0.3)
+                    :y(0)
         event.Timer(0.5,function()
             event.Persist("kb char", "dev input", function(char)
                 local text = DevInput:GetText()
@@ -119,10 +126,14 @@ local function ready(overlay)
                     local res = eval(text)
                     if res then
                         if type(res) == "table" then
-                            for i=1,res.n or table.getn(res) do
-                                res[i] = tostring(res[i])
+                            if type(res[1]) == "table" and res.n == 1 then
+                                printtable(res[1])
+                            else
+                                for i=1,res.n or table.getn(res) do
+                                    res[i] = tostring(res[i])
+                                end
+                                show(table.concat(res,"  "))
                             end
-                            show(table.concat(res,"  "))
                         else
                             show(tostring(res))
                         end

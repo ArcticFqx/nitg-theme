@@ -33,16 +33,16 @@ local function titleInit()
             actors.bgfade:Load(bg)
             checkBG(actors.bgfade)
             actors.bgfade:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
-            actors.bgfade:linear(0.6)
-            actors.bgfade:diffusealpha(1)
+                         :linear(0.6)
+                         :diffusealpha(1)
         else
             actors.bgback:Load(bg)
             checkBG(actors.bgback)
             actors.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
             actors.bgfade:linear(0.6)
-            actors.bgfade:diffusealpha(0)
+                         :diffusealpha(0)
         end
-        event.Timer(1,function()
+        event.Timer(0.7,function()
             if fadebg > 1 then
                 actors.bgback:Load(nobg)
             else
@@ -65,7 +65,7 @@ local function titleInit()
         actors.logoaft:zoom(size*bs)
         actors.logotop:zoom(size*bs)
         actors.logowave:zoom(size*(1+modulo(bac,1)/5))
-        actors.logowave:diffuse(1,1,1,bac == 0 and 0 or 1-bac)
+                       :diffuse(1,1,1,bac == 0 and 0 or 1-bac)
         
         if t >= lastClock and hidden then
             lastClock = t+oneFrame
@@ -81,13 +81,12 @@ local function titleInit()
     checkBG(actors.bgback)
     actors.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
 
-    aft:SetWidth(DISPLAY:GetDisplayWidth())
-    aft:SetHeight(DISPLAY:GetDisplayHeight())
-    aft:EnablePreserveTexture(true)
-    aft:Create()
+    aft :SetWidth(DISPLAY:GetDisplayWidth())
+        :SetHeight(DISPLAY:GetDisplayHeight())
+        :EnablePreserveTexture(true)
+        :Create()
 
-    actors.aftspriteback:diffusealpha(0.9)
-    actors.aftspriteback:SetTexture(aft:GetTexture())
+    actors.aftspriteback:diffusealpha(0.9):SetTexture(aft:GetTexture())
     actors.aftspritefront:SetTexture(aft:GetTexture())
 
     local af = stitch("lua.geno").ActorByName
@@ -196,5 +195,37 @@ return Def.ActorFrame {
                 print("Third button")
             end
         }
+    },
+    Def.Sprite {
+        Name="movie",
+        File="/Graphics/stop.mpg",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y,
+        InitCommand="pause"
+    },
+    Def.Shader {
+        Frag = [[
+            #version 120
+            uniform sampler2D sampler0;
+            varying vec2 textureCoord;
+            varying vec4 color;
+
+            void main (void)
+            {
+                vec4 t = texture2D( sampler0, textureCoord );
+                if (t.r < 0.5 && t.g > 0.6 && t.b < 0.4){
+                    t.a = 0;
+                }
+                gl_FragColor = t*color;
+            }
+        ]],
+        InitCommand = function( shader )
+            local movie = stitch("lua.geno").ActorByName.movie
+            movie:SetShader(shader)
+        end
+    },
+    Def.Sound {
+        Name="stop",
+        File="/Sounds/stop.ogg",
+        X=SCREEN_CENTER_X, Y=SCREEN_CENTER_Y
     }
 }
