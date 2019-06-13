@@ -55,9 +55,8 @@ function keyboard:KeyHandler()
 end
 
 event.Persist("overlay update", "keyboard", function()
-    local keys = string.find(text,'Key_K?P? ?(.-) %-') 
+    local keys = string.gfind(text,'Key_K?P? ?(.-) %-') 
     if not keys then return end
-    keys = string.gfind(text,'Key_K?P? ?(.-) %-') 
 
     local new = {}
     for match in keys do
