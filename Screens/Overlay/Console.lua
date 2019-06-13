@@ -1,6 +1,8 @@
 local scale = 0.6
+
 local function ready(overlay)
     local event = stitch "lua.event"
+    local config = stitch "config"
     local enabled = false
     local DevBuffer = overlay.DevBuffer
     local DevConsole = overlay.DevConsole
@@ -13,6 +15,15 @@ local function ready(overlay)
     local print = print
     local screenman = getmetatable(SCREENMAN)
     local sysmsg = screenman.SystemMessage
+
+    local height = DevBuffer:GetHeight()
+    local quadheight = 10+height*20*scale
+    DevBuffer:x(10) 
+             :y(10+height*17*scale)
+    DevInput:x(10)
+            :y(20+height*18*scale)
+    DevBackground:zoomto(SCREEN_WIDTH, quadheight)
+    DevConsole:y(-quadheight)
 
     local function append(msg)
         table.remove(buffer, 1)
@@ -62,13 +73,6 @@ local function ready(overlay)
         show("}")
     end
 
-    local height = DevBuffer:GetHeight()
-    local quadheight = 10+height*20*scale
-    DevBuffer:xy(10,10+height*17*scale)
-    DevInput:xy(10,20+height*18*scale)
-    DevBackground:zoomto(SCREEN_WIDTH, quadheight)
-    DevConsole:y(-quadheight)
-
     local function eval(code)
         local fn,err,erralt
         fn, err = loadstring(
@@ -95,8 +99,13 @@ local function ready(overlay)
         show(string.gsub(err,"^.-:1: ","error: "))
     end
 
-    event.Persist("kb char","dev console",function(char)
-        if char ~= "|" then return end
+    local function toggleCheck(char, special)
+        return char == config.console 
+                and special.ctrl and not special.altgr
+    end
+
+    event.Persist("key char","dev console",function(char, special)
+        if not toggleCheck(char, special) then return end
         enabled = not enabled
         event.Ignore("input", enabled)
         DevConsole:finishtweening()
@@ -108,8 +117,8 @@ local function ready(overlay)
                 DevConsole:hidden(1)
                 DevInput:settext("")
             end)
-            event.Remove("kb char", "dev input")
-            event.Remove("kb special", "dev input")
+            event.Remove("key char", "dev input")
+            event.Remove("key func", "dev input")
             return
         end
 
@@ -118,8 +127,10 @@ local function ready(overlay)
                     :decelerate(0.3)
                     :y(0)
         event.Timer(0.5,function()
-            event.Persist("kb char", "dev input", function(char)
-                local text = DevInput:GetText()
+            local charray = {}
+            event.Persist("key char", "dev input", function(char, special)
+                if toggleCheck(char, special) then return end
+                local text = table.concat(charray)
                 if char == "\n" then
                     DevInput:settext("")
                     show("> " .. text)
@@ -138,14 +149,16 @@ local function ready(overlay)
                             show(tostring(res))
                         end
                     end
+                    charray = {}
                 else
+                    table.insert(charray,char)
                     DevInput:settext(text .. char)
                 end
             end)
-            event.Persist("kb special","dev input", function(char)
-                local text = DevInput:GetText()
+            event.Persist("key func","dev input", function(char)
                 if char == "backspace" then
-                    DevInput:settext(string.sub(text,1,string.len(text)-1))
+                    table.remove(charray)
+                    DevInput:settext(table.concat(charray))
                 end
             end)
         end)

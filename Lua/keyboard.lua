@@ -1,54 +1,25 @@
+local config = stitch "config"
 local event = stitch "lua.event"
-
 local keyboard = {}
-
-local layout = {
-    Norwegian = "nor",
-    Qwertz,
-    QwertyUK
-}
-
-local lang = layout.Norwegian
 
 local metabuf = {}
 keyboard.buffer = setmetatable({}, metabuf)
 
+local map = stitch "lua.keyboard.layout"
+keyboard.map = map
+keyboard.lang = config.layout
+
 local special = {
-    backspace = false,
     shift = false,
     ctrl = false,
     alt = false,
     win = false,
-    menu = false,
-    altgr = false,
-    escape = false
+    altgr = false
 }
-
 keyboard.special = special
 
-local map = {
-    nor = {
-        remap = {
-            space = " ", enter = "\n", tab = "    ", 
-            ["`"] = "|", ["-"] = "+", ["["] = "å", ["]"] = "¨", ["\\"] = "'", [";"] = "ø", ["'"] = "æ", ["/"] = "-", ["="] = "\\"
-        },
-        shift = {
-            ["1"] = "!", ["2"] = "\"", ["3"] = "#", ["4"] = "¤", ["5"] = "%", ["6"] = "&", ["7"] = "/", ["8"] = "(", ["9"] = ")", ["0"] = "=",
-            ["|"] = "§", ["+"] = "?", ["å"] = "Å", ["¨"] = "^", ["'"] = "*", ["ø"] = "Ø", ["æ"] = "Æ", ["-"] = "_", ["\\"] = "`",
-            [","] = ";", ["."] = ":"
-        },
-        altgr = {
-            ["2"] = "@", ["3"] = "£", ["4"] = "$", ["5"] = "€", ["7"] = "{", ["8"] = "[", ["9"] = "]", ["0"] = "}",
-            ["¨"] = "~", ["\\"] = "´", m = "µ"
-        },
-        alt = {
-            ["'"] = "<", ["<"] = ">"
-        }
-    }
-}
-
 local function check(c)
-    local map = map[lang]
+    local map = map[keyboard.lang]
     local char = map.remap[c] or c
     local out = char
     if special.shift then
@@ -64,42 +35,41 @@ local function check(c)
 end
 
 local cmd = {
-    ["backspace"] = true,
-    ["left shift"] = true,
-    ["right shift"] = true,
-    ["left ctrl"] = true,
-    ["right ctrl"] = true,
-    ["right meta"] = true,
-    ["left meta"] = true,
-    ["menu"] = true,
-    ["left alt"] = true,
-    ["right alt"] = true,
-    ["escape"] = true
+    ["left shift"] = true, ["right shift"] = true,
+    ["left ctrl"] = true, ["right ctrl"] = true,
+    ["right meta"] = true, ["left meta"] = true,
+    ["left alt"] = true, ["right alt"] = true,
+    backspace = true, menu = true, escape = true,
+    left = true, right = true, up = true, down = true,
+    ["caps lock"] = true, ["num lock"] = true, ["scroll lock"] = true,
+    pgdn = true, pgup = true, ["end"] = true, home = true,
+    prtsc = true, insert = true, pause = true
 }
+for i=1,12 do
+    cmd["F"..i] = true
+end
 
 local text = ""
 function keyboard:KeyHandler() 
     text = self:GetText()
 end
 
-event.Persist("update", "keyboard", function()
-    local keys = string.gfind(text,'Key_(.-) %-') 
+event.Persist("overlay update", "keyboard", function()
+    local keys = string.find(text,'Key_K?P? ?(.-) %-') 
     if not keys then return end
+    keys = string.gfind(text,'Key_K?P? ?(.-) %-') 
 
     local new = {}
     for match in keys do
         new[match] = true
     end
-    
+    print(keys)
 
-    special.backspace = new.backspace or false
     special.shift = new["left shift"] or new["right shift"] or false
     special.ctrl = new["left ctrl"] or new["right ctrl"] or false
     special.alt = new["left alt"] or new["right alt"] or false
     special.win = new["left meta"] or new["right meta"] or false
-    special.menu = new.menu or false
-    special.altgr = new["left ctrl"] and new["right alt"] or false
-    special.escape = new.escape or false
+    special.altgr = new["right alt"] or (special.ctrl and special.alt) or false
     
     local buffer = keyboard.buffer
 
@@ -108,10 +78,10 @@ event.Persist("update", "keyboard", function()
             if not cmd[k] then
                 local c = check(k)
                 if c then
-                    event.Call("kb char", c, special)
+                    event.Call("key char", c, special)
                 end
             else
-                event.Call("kb special", k)
+                event.Call("key func", k, special)
             end
         end
     end

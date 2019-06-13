@@ -66,7 +66,6 @@ function stitch.nocache( name, env, ... )
 end
 
 local requireCache = {}
--- Require with a search path in your song directory, caches path hits and results
 function stitch.RequireEnv(name, env, ...)
     name = lower(name)
     if requireCache[name] then
@@ -96,7 +95,6 @@ function stitch:__call(name, ...)
     return stitch.RequireEnv(name, nil, unpack(arg))
 end
 
--- And we are done!
 setmetatable(stitch, stitch)
 
 Trace '[Stitch] Initialized!'

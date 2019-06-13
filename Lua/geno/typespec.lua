@@ -32,7 +32,6 @@ local typespec = {
             end
         end
     },
-    ActorFrame = { },
     Quad = { Type = "Quad" },
     Text = { Type = "BitmapText" },
     ActorFrameTexture = { Type="ActorFrameTexture" },
@@ -46,7 +45,8 @@ local typespec = {
     Actor = { Type = "Actor" },
     Aux = { Type = "Actor" },
     Proxy = { Type = "ActorProxy" },
-    ActorProxy = { Type = "ActorProxy" }
+    ActorProxy = { Type = "ActorProxy" },
+    ActorFrame = { }
 }
 
 local function runcommand(actor, template, kind)
