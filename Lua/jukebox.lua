@@ -86,7 +86,7 @@ local function update()
 end
 
 event.Persist("overlay update", "jukebox", update)
-event.Persist("key char", "jukebox", function(c) 
+event.Persist("key func", "jukebox", function(c) 
     if c == "F4" then 
         jukebox.NextSong() 
         SCREENMAN:SystemMessage("Skipping song")
