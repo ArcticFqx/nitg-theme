@@ -6,7 +6,7 @@ local function bmtInit(self)
     self:halign(0)
     self:valign(0)
 
-    event.Add("kb char", "readchar", function(c, spc)
+    event.Add("key char", "readchar", function(c, spc)
         local text = self:GetText()
         if c == "\n" and spc.ctrl then
             self:settext("")
@@ -16,7 +16,7 @@ local function bmtInit(self)
         end
     end)
 
-    event.Add("kb special", "special", function(c)
+    event.Add("key func", "special", function(c)
         local text = self:GetText()
         if c == "backspace" then
             self:settext(string.sub(text, 1, string.len(text) -1 ))
@@ -44,5 +44,9 @@ return Def.ActorFrame {
         Text="",
         X = 10, Y = 10,
         OnCommand=bmtInit
+    },
+    Def.Audio{
+        Name="sound",
+        File="/sounds/silent"
     }
 }
