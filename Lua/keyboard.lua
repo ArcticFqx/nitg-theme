@@ -63,7 +63,6 @@ event.Persist("overlay update", "keyboard", function()
     for match in keys do
         new[match] = true
     end
-    print(keys)
 
     special.shift = new["left shift"] or new["right shift"] or false
     special.ctrl = new["left ctrl"] or new["right ctrl"] or false

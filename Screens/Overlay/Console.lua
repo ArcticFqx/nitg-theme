@@ -18,10 +18,8 @@ local function ready(overlay)
 
     local height = DevBuffer:GetHeight()
     local quadheight = 10+height*20*scale
-    DevBuffer:x(10) 
-             :y(10+height*17*scale)
-    DevInput:x(10)
-            :y(20+height*18*scale)
+    DevBuffer:xy(10,10+height*17*scale)
+    DevInput:xy(10,20+height*18*scale)
     DevBackground:zoomto(SCREEN_WIDTH, quadheight)
     DevConsole:y(-quadheight)
 
