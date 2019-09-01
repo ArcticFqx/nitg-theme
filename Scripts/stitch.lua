@@ -1,7 +1,7 @@
--- -- -- -- -- -- -- -- -- --
--- Forked from LibActor    --
--- Stitch global reference --
--- -- -- -- -- -- -- -- -- --
+local gsub, lower, find, gfind = string.gsub, string.lower, string.find, string.gfind
+local getn, loadfile, type = table.getn, loadfile, type
+local setfenv, setmetatable = setfenv, setmetatable
+local unpack, sub, pairs = unpack, string.sub, pairs
 
 if _G.stitch then
     Trace("[Stitch] Reusing old stitch")
@@ -9,23 +9,19 @@ if _G.stitch then
     return
 end
 
-local stitch = {
-    _LAXVER = 'LibActor 0.5.0',
-    _VERSION = 'Stitch 190507 dev'
+local stitch = { 
+    _VERSION = 'Stitch 190731 dev' 
 }
 
 _G.stitch = stitch
 _G.stx = stitch
 
-local gsub, lower, find, gfind = string.gsub, string.lower, string.find, string.gfind
-local getn, loadfile, Debug, type = table.getn, loadfile, Debug, type
-local setfenv, setmetatable = setfenv, setmetatable
-local unpack, Trace, sub, pairs = unpack, Trace, string.sub, pairs
-
 local folder = '/'..THEME:GetCurThemeName()..'/'
 local addFolder = lower(PREFSMAN:GetPreference('AdditionalFolders'))
 local add = './themes,' .. gsub(addFolder, ',' ,'/themes,') .. '/themes'
 local hit = ''
+
+local requireCache = {}
 
 local function load(name)
     local file = gsub(lower(name), '%.', '/') .. '.lua'
@@ -35,16 +31,16 @@ local function load(name)
         local func, err = loadfile(path)
         if func then
             hit = w .. ','
-            Debug('[Loading] ' .. path)
+            _G.Debug('[Loading] ' .. path)
             return func
         end
-        log[getn(log)+1] = '[Error] ' .. gsub(err,'\n.+','')
+        log[getn(log)+1] = '[Error] ' .. err --gsub(err,'\n.+','')
     end
 
     for i=1, getn(log) do
-        if not find(log[i], 'cannot read') then Debug(log[i]) return end
+        if not find(log[i], 'cannot read') then _G.Debug(log[i]) return end
     end
-    Debug(log[1])
+    _G.Debug(log[1])
 end
 
 function stitch.nocache( name, env, ... )
@@ -57,15 +53,14 @@ function stitch.nocache( name, env, ... )
     env = env or {}
     env.arg = arg
 
-    setfenv( func, setmetatable(
-        env,
-        { __index = _G, __newindex = _G }
-    ))
+    if not getmetatable(env) then
+        setmetatable( env, { __index = _G, __newindex = _G } )
+    end
+    setfenv( func, env )
 
     return func()
 end
 
-local requireCache = {}
 function stitch.RequireEnv(name, env, ...)
     name = lower(name)
     if requireCache[name] then
@@ -79,10 +74,11 @@ function stitch.RequireEnv(name, env, ...)
     env = env or {}
     env.arg = arg
 
-    setfenv( func, setmetatable(
-        env,
-        { __index = _G, __newindex = _G }
-    ))
+    if not getmetatable(env) then
+        setmetatable( env, { __index = _G, __newindex = _G } )
+    end
+
+    setfenv( func, env )
     requireCache[name] = {func()}
     return unpack(requireCache[name])
 end
@@ -97,7 +93,12 @@ end
 
 setmetatable(stitch, stitch)
 
-Trace '[Stitch] Initialized!'
-Trace('[Stitch] We are on version "' .. stitch._VERSION .. '"')
+_G.Trace '[Stitch] Initialized!'
+_G.Trace('[Stitch] We are on version "' .. stitch._VERSION .. '"')
+
+-- Preload config
+local config = setmetatable({},{})
+stitch.RequireEnv("config", config)
+requireCache["config"] = {config}
 
 return stitch

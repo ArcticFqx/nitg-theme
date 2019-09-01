@@ -16,7 +16,8 @@ local hecc = {
     "Powered by Ligma",
     "I love Video Games! Like a Video Game! Like a whole Video Game! You have no Video Game!!",
     "Just bracket it, you'll be fine!",
-    "It's like osu, but you use your feet"
+    "It's like osu, but you use your feet",
+    "Ignotis me senpai"
 }
 
 math.randomseed(tonumber(os.date("%S")))

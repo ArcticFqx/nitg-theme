@@ -1,5 +1,7 @@
 local event = stitch "lua.event"
 
+local getn = table.getn
+
 local stack = {}
 function stack:Push(entry)
     self[getn(self) + 1] = entry
@@ -16,37 +18,26 @@ function stack:Top()
 end
 
 local UI = {}
+event.Add("input","ui", function(key, press, ply)
+    local top = stack:Top()
+    if not top then return end
+end)
 
-function UI.Enable()
+event.Persist("screen new", "ui", function ( )
+    repeat until not stack:Pop()
+end)
 
-    event.Add("input","ui", function(key, press, ply)
-        local top = stack:Top()
-        if not top then return end
-
-    end)
-
-    event.Add("screen new", "ui", function (  )
-        repeat until not stack:Pop()
-    end)
-end
-
-function UI.ActiveFrame(frame)
-    -- Only one active frame
-    if stack:Top() then return end
-    
+function UI.PushFrame(frame)
     stack:Push(frame)
 end
 
-local function build( t )
-    
-end
 
 function UI:__index(k)
     return function ( t )
         t = stitch ("ui." .. k)( t )
         
         if t.Active then
-            UI.ActiveFrame = t
+            UI.PushFrame( t )
         end
         
         return t

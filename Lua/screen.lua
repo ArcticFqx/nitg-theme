@@ -1,24 +1,53 @@
 local event = stitch "lua.event"
 
-local screen = {}
+local screen = {
+    ExitPath = "echo", -- should be read only
+    ExitParam = "done" -- should be read only
+}
+
+local reserved = {
+    Prepare = true,
+    PlayGame = true,
+    ScreenGamePlay = true
+}
 
 local currentScreen = arg[1]
--- Swap vars, loads either LuaScreen or ScreenLua
 local ls = "Lua"
 local sl = "Screen"
 local check = false
 function screen:Init( )
-    print("Current screen is '" .. currentScreen .. "'")
+    print("Setting new Lua screen '" .. currentScreen .. "'")
     self:hidden(1)
 end
 
-function screen.SetNewScreen(name)
-    currentScreen = name
-    hasChanged = true
+function screen.Next()
     sl,ls = ls,sl
+    return sl .. ls
+end
+
+function screen.Prepare(name)
+    currentScreen = name
     event.Call("screen new", name)
     event.Reset()
-    SCREENMAN:SetNewScreen(sl .. ls)
+    return name
+end
+
+function screen.SetNewScreen(name)
+    screen.Prepare(name)
+    if reserved[name] then
+        SCREENMAN:SetNewScreen(name)
+    else
+        SCREENMAN:SetNewScreen(screen.Next())
+    end
+end
+
+function screen.Exit(path)
+    if reserved[currentScreen] then return end
+    if path then
+        screen.ExitPath = "cmd"
+        screen.ExitParam = "/c start " .. path
+    end
+    SCREENMAN:SetNewScreen("ExitGame")
 end
 
 function screen.GetLayout()

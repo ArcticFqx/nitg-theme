@@ -33,14 +33,14 @@ local function titleInit()
             actors.bgfade:Load(bg)
             checkBG(actors.bgfade)
             actors.bgfade:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
-                         :linear(0.6)
-                         :diffusealpha(1)
+            actors.bgfade:linear(0.6)
+            actors.bgfade:diffusealpha(1)
         else
             actors.bgback:Load(bg)
             checkBG(actors.bgback)
             actors.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
             actors.bgfade:linear(0.6)
-                         :diffusealpha(0)
+            actors.bgfade:diffusealpha(0)
         end
         event.Timer(0.7,function()
             if fadebg > 1 then
@@ -65,7 +65,7 @@ local function titleInit()
         actors.logoaft:zoom(size*bs)
         actors.logotop:zoom(size*bs)
         actors.logowave:zoom(size*(1+modulo(bac,1)/5))
-                       :diffuse(1,1,1,bac == 0 and 0 or 1-bac)
+        actors.logowave:diffuse(1,1,1,bac == 0 and 0 or 1-bac)
         
         if t >= lastClock and hidden then
             lastClock = t+oneFrame
@@ -82,11 +82,12 @@ local function titleInit()
     actors.bgback:zoomto(SCREEN_WIDTH,SCREEN_HEIGHT)
 
     aft :SetWidth(DISPLAY:GetDisplayWidth())
-        :SetHeight(DISPLAY:GetDisplayHeight())
-        :EnablePreserveTexture(true)
-        :Create()
+    aft :SetHeight(DISPLAY:GetDisplayHeight())
+    aft :EnablePreserveTexture(true)
+    aft :Create()
 
-    actors.aftspriteback:diffusealpha(0.9):SetTexture(aft:GetTexture())
+    actors.aftspriteback:diffusealpha(0.9)
+    actors.aftspriteback:SetTexture(aft:GetTexture())
     actors.aftspritefront:SetTexture(aft:GetTexture())
 end
 
@@ -174,19 +175,19 @@ return Def.ActorFrame {
         UI.Button {
             Text = "Start Game",
             OnSelect = function (  )
-                stitch "lua.screen" . SetNewScreen "Experiment"
+                screen.SetNewScreen "PlayGame"
             end
         },
         UI.Button {
-            Text = "Lua Sandbox",
-            OnSelect = function (  )
-                stitch "lua.screen" . SetNewScreen "Sandbox"
+            Text = "UKSRT Discord",
+            OnSelect = function ( )
+                screen.Exit( "https://discord.gg/Zt3DTb6" )
             end
         },
         UI.Button {
-            Text = "More options",
+            Text = "Exit Game",
             OnSelect = function (  )
-                print("Third button")
+                screen.Exit( )
             end
         }
     }

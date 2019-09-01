@@ -3,9 +3,6 @@
         Type="Actor"
         Name="Event"
 
-        OnCommand="luaeffect,Update;"
-        UpdateCommand="%stx'lua.event'.Update"
-
         StepP1LeftPressMessageCommand="%stx'lua.input'.Input ( 1, 1, true )"
         StepP1LeftLiftMessageCommand="%stx'lua.input'.Input  ( 1, 1, false )"
         StepP1DownPressMessageCommand="%stx'lua.input'.Input ( 1, 2, true )"

@@ -1,15 +1,19 @@
 local scale = 0.6
 
-local function ready(overlay)
+function ready(af)
+    local self = af.DevConsole
+    print(self)
     local event = stitch "lua.event"
     local config = stitch "config"
     local enabled = false
-    local DevBuffer = overlay.DevBuffer
-    local DevConsole = overlay.DevConsole
-    local DevInput = overlay.DevInput
-    local DevBackground = overlay.DevBackground
+    local DevConsole = self
+    local DevBuffer = af.DevBuffer
+    local DevInput = af.DevInput
+    local DevBackground = af.DevBackground
+    print(self,DevBuffer,DevInput,DevBackground)
     
     local buffer = {"","","","","","","","","","","","","","",""}
+    local history = {cur = 0}
     local debug = Debug
     local trace = Trace
     local print = print
@@ -18,8 +22,10 @@ local function ready(overlay)
 
     local height = DevBuffer:GetHeight()
     local quadheight = 10+height*20*scale
-    DevBuffer:xy(10,10+height*17*scale)
-    DevInput:xy(10,20+height*18*scale)
+    DevBuffer:x(10) 
+    DevBuffer:y(10+height*17*scale)
+    DevInput:x(10)
+    DevInput:y(20+height*18*scale)
     DevBackground:zoomto(SCREEN_WIDTH, quadheight)
     DevConsole:y(-quadheight)
 
@@ -63,12 +69,64 @@ local function ready(overlay)
         print(s)
     end
 
-    local function printtable(t)
-        show("{")
-        for k,v in pairs(t) do
-            show("  " .. tostring(k) .. " = " .. tostring(v))
+    local function tab(num, con)
+        return string.rep("  ", num or 0) .. con
+    end
+
+    local function GetChildren(af)
+        local ret = {}
+        for i=1,af:GetNumChildren() do
+            ret[i+1] = af:GetChildAt(i-1)
         end
-        show("}")
+        return ret
+    end
+
+    local function printtable(t, deep, rec)
+        rec = rec or {}
+        rec[t] = t
+        local vs
+        if type(t) == "userdata" then
+            local hasChildren = t:GetNumChildren() > 0
+            vs = string.format("%s[%s]", string.gfind(tostring(t),"[^%s]+")(), t:GetName())
+            if hasChildren then
+                t = GetChildren(t)
+                show(tab(deep,vs..":"))
+            else
+                show(tab(deep,vs))
+                return
+            end
+        end
+        show(tab(deep,"{"))
+        for k,v in pairs(t) do
+            local vt = type(v)
+            vs = nil
+            if vt == "userdata" and v.GetName then
+                vs = string.format("%s[%s]", string.gfind(tostring(v),"[^%s]+")(), v:GetName())
+                if v.GetText then
+                    vs = vs..": ".. v:GetText()
+                end
+                if v.GetTexture and v:GetTexture() then
+                    vs = vs..": ".. v:GetTexture():GetPath()
+                end
+                if v.GetNumChildren then
+                    local num = v:GetNumChildren()
+                    if num > 0 and deep then
+                        vs = vs..":"
+                    elseif num > 0 then
+                        vs = vs..": " .. num .. (num>1 and " children" or " child")
+                    end
+                end
+            end
+            show(tab(deep,"  " .. tostring(k) .. " = " .. tostring(vs or v)))
+            if deep and (vt == "table" or vt == "userdata" and v.GetNumChildren) and not rec[v] then
+                if vt == "table" then
+                    printtable(v,deep+1, rec)
+                elseif v:GetNumChildren() > 0 then
+                    printtable(GetChildren(v), deep+1, rec)
+                end
+            end
+        end
+        show(tab(deep,"}"))
     end
 
     local function eval(code)
@@ -105,15 +163,15 @@ local function ready(overlay)
     event.Persist("key char","dev console",function(char, special)
         if not toggleCheck(char, special) then return end
         enabled = not enabled
-        event.Ignore("input", enabled)
         DevConsole:finishtweening()
         if not enabled then
-            DevConsole  :accelerate (0.3)
-                        :y(-quadheight)
+            DevConsole:accelerate (0.3)
+            DevConsole:y(-quadheight)
             event.Timer(0.4,function()
                 if enabled then return end
                 DevConsole:hidden(1)
                 DevInput:settext("")
+                SCREENMAN:SetInputMode(0)
             end)
             event.Remove("key char", "dev input")
             event.Remove("key func", "dev input")
@@ -121,22 +179,32 @@ local function ready(overlay)
         end
 
         DevBuffer:settext(table.concat(buffer,"\n"))
-        DevConsole  :visible(1)
-                    :decelerate(0.3)
-                    :y(0)
+        DevConsole:visible(1)
+        DevConsole:decelerate(0.3)
+        DevConsole:y(0)
+
+        SCREENMAN:SetInputMode(2)
+
         event.Timer(0.5,function()
             local charray = {}
             event.Persist("key char", "dev input", function(char, special)
                 if toggleCheck(char, special) then return end
-                local text = table.concat(charray)
                 if char == "\n" then
+                    local deep = charray[1] == "!"
+                    local text = table.concat(charray, "", deep and 2 or 1)
+                    history[table.getn(history) + 1] = charray
                     DevInput:settext("")
+                    history.cur = table.getn(history)+1
                     show("> " .. text)
                     local res = eval(text)
                     if res then
                         if type(res) == "table" then
                             if type(res[1]) == "table" and res.n == 1 then
-                                printtable(res[1])
+                                if deep then deep = 0 else deep = nil end
+                                printtable(res[1], deep)
+                            elseif type(res[1]) == "userdata" and res.n == 1 and res[1].GetNumChildren then
+                                if deep then deep = 0 else deep = nil end
+                                printtable(res[1], deep)
                             else
                                 for i=1,res.n or table.getn(res) do
                                     res[i] = tostring(res[i])
@@ -149,14 +217,28 @@ local function ready(overlay)
                     end
                     charray = {}
                 else
-                    table.insert(charray,char)
-                    DevInput:settext(text .. char)
+                    table.insert(charray, char)
+                    DevInput:settext(table.concat(charray))
                 end
             end)
             event.Persist("key func","dev input", function(char)
                 if char == "backspace" then
                     table.remove(charray)
                     DevInput:settext(table.concat(charray))
+                    return
+                end
+                local scroll = char == "up" and -1 or char == "down" and 1 or 0
+                if scroll ~= 0 then
+                    local cur = history.cur + scroll
+                    if not history[cur] then return end
+                    history.cur = cur
+                    charray = history[cur]
+                    DevInput:settext(table.concat(charray))
+                end
+                if char == "escape" then
+                    DevInput:settext("")
+                    charray = {}
+                    history.cur = table.getn(history)+1
                 end
             end)
         end)

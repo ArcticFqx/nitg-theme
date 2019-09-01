@@ -2,9 +2,9 @@ return Def.ActorFrame {
     OnReady = function()
         local event = stitch "lua.event"
         local screen = stitch "lua.screen"
-        event.Persist("key char", "escape", function(char)
+        event.Persist("key func", "escape", function(char)
             if char == "F5" then
-                screen.SetNewScreen "TitleScreen"
+                screen.SetNewScreen "Init"
             end
         end)
 

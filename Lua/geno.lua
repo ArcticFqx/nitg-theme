@@ -69,18 +69,6 @@ end
 
 smeta.__index = smeta
 
-function geno.RegisterOverlay(a)
-    local name = a:GetName()
-    if geno.Overlay[name] then return end
-    if name == "" then
-        geno.Overlay.n = geno.Overlay.n+1
-        name = tostring(geno.Overlay.n)
-        a:SetName(name)
-    end
-    geno.Overlay[a] = name
-    geno.Overlay[name] = a
-end
-
 -- This runs first
 function geno.Cond(index, type)
     local s = stack:Top()
@@ -140,6 +128,7 @@ function geno.File()
 end
 
 local function patchFunctionChaining(actor)
+    --[[
     local mt,at = getmetatable(actor),{}
     for k,v in pairs(mt) do
         mt[k],at[k] = nil,v
@@ -151,6 +140,33 @@ local function patchFunctionChaining(actor)
     end
     mt.__geno = true
     setmetatable(mt, mt)
+    ]]
+end
+
+function geno:Meta()
+    local s = stack:Top()
+    local template = s.template[s.i]
+    local meta = typespec[template.Type][self]
+    if meta then
+        return meta(template)
+    end
+end
+
+function geno:RegisterOverlay()
+    local name = self:GetName()
+    if geno.Overlay[name] then return end
+    if name == "" then
+        geno.Overlay.n = geno.Overlay.n+1
+        name = tostring(geno.Overlay.n)
+        self:SetName(name)
+    end
+
+    if not self.__geno then
+        patchFunctionChaining(self)
+    end
+
+    geno.Overlay[self] = name
+    geno.Overlay[name] = self
 end
 
 -- This runs third
@@ -208,11 +224,11 @@ function geno:InitCmd()
 end
 
 -- OnCommand Time
-function geno.OnCmd(_, a)
+function geno:OnCmd(a)
     a = a or geno.Actors
     for k,v in ipairs(a) do
         if type(v) == "table" then
-            geno.OnCmd(_, v)
+            geno.OnCmd(self, v)
         else
             typespec[v].On(v, geno.TemplateByActor[v])
         end

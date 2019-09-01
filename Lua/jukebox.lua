@@ -6,15 +6,20 @@ local jukebox = {}
 local song, prev
 local isPlaying = false
 local isAutoplay = false
+local isGameplay = false
 
-function jukebox.NextSong()
+function jukebox.NextSong(newSong, game)
     print("Just played:", jukebox.CurrentSong())
     prev = song
-    song = SONGMAN:GetRandomSong()
+    song = newSong or SONGMAN:GetRandomSong()
     print("Now playing:", jukebox.CurrentSong())
-    sound:load(song:GetMusicPath())
-    sound:start()
-    GAMESTATE:SetCurrentSong(song)
+    isGameplay = game
+
+    if not isGameplay then
+        sound:load(song:GetMusicPath())
+        sound:start()
+    end
+
     isPlaying = true
     event.Call("jukebox next")
 end
@@ -29,7 +34,7 @@ end
 
 function jukebox.CurrentSong()
     if song then 
-        return  song:GetTranslitArtist(), 
+        return song:GetTranslitArtist(), 
             song:GetTranslitMainTitle()
     else
         return "No artist", "Nothing's playing"
@@ -45,16 +50,53 @@ function jukebox.SongLength()
 end
 
 function jukebox.SongPositions(offset)
-    local pos = sound:get():GetSoundPosition() + (offset or 0)
-    return pos, song:GetBeatFromElapsedTime(pos)
+    if isGameplay then
+        return GAMESTATE:GetSongTime()
+    else
+        local pos = sound:get():GetSoundPosition() + (offset or 0)
+        return pos, song and song:GetBeatFromElapsedTime(pos) or 0
+    end
 end
 
 function jukebox.IsPlaying()
-    return IsPlaying
+    return isPlaying
+end
+
+function jukebox.Pause()
+    sound:stop()
+    isPlaying = false
+end
+
+function jukebox.Find(s)
+    local search = stitch "lua.songsearch"
+    local r = search.Find(s)
+
+    local o = {}
+    for _,v in pairs(r) do
+        local up = v
+        o[table.getn(o)+1] = setmetatable({
+            Artist = v:GetTranslitArtist (),
+            Title = v:GetTranslitMainTitle (),
+            Length = SecondsToMMSS (v:MusicLengthSeconds ()),
+            Subtitle = string.sub(v:GetTranslitFullTitle(), string.len(v:GetTranslitMainTitle())+2),
+            Song = v
+        },{
+            __call = function(self)
+                jukebox.NextSong(self.Song)
+            end
+        })
+    end
+    return o
+end
+
+function jukebox.Stop()
+    jukebox.Pause()
+    song = nil
+    event.Call("jukebox next")
 end
 
 local vid = {
-    avi = true, mpg = true, mpeg = true
+    avi = true, mpg = true, mpeg = true, mp4 = true, webm = true, mkv = true
 }
 function jukebox.GetSongBackground()
     local bg = song:GetBackgroundPath()
@@ -85,7 +127,7 @@ local function update()
     end
 end
 
-event.Persist("overlay update", "jukebox", update)
+event.Persist("update", "jukebox", update)
 event.Persist("key func", "jukebox", function(c) 
     if c == "F4" then 
         jukebox.NextSong() 

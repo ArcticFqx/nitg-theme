@@ -43,7 +43,7 @@ local cmd = {
     left = true, right = true, up = true, down = true,
     ["caps lock"] = true, ["num lock"] = true, ["scroll lock"] = true,
     pgdn = true, pgup = true, ["end"] = true, home = true,
-    prtsc = true, insert = true, pause = true
+    prtsc = true, insert = true, pause = true, delete = true
 }
 for i=1,12 do
     cmd["F"..i] = true
@@ -54,7 +54,7 @@ function keyboard:KeyHandler()
     text = self:GetText()
 end
 
-event.Persist("overlay update", "keyboard", function()
+event.Persist("update", "keyboard", function()
     local keys = string.gfind(text,'Key_K?P? ?(.-) %-') 
     if not keys then return end
 
@@ -62,12 +62,12 @@ event.Persist("overlay update", "keyboard", function()
     for match in keys do
         new[match] = true
     end
-
+    
     special.shift = new["left shift"] or new["right shift"] or false
     special.ctrl = new["left ctrl"] or new["right ctrl"] or false
     special.alt = new["left alt"] or new["right alt"] or false
     special.win = new["left meta"] or new["right meta"] or false
-    special.altgr = new["right alt"] or (special.ctrl and special.alt) or false
+    special.altgr = new["right alt"] or special.alt and special.ctrl or false
     
     local buffer = keyboard.buffer
 

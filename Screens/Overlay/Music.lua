@@ -26,7 +26,7 @@ local function ready(actors)
         name:settext(formatName())
     end)
 
-    event.Persist("overlay update", "screen.music.update", function()
+    event.Persist("update", "screen.music.update", function()
         update(sound, name, bar)
     end)
     

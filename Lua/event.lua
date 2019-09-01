@@ -19,7 +19,7 @@ function event.Ignore( name, bool )
     ignore[name] = bool and true
 end
 
-function event.Call(name, ...)
+local function Call( name, ... )
     if ignore[name] then return end
     stacksize = stacksize+1
 
@@ -57,18 +57,23 @@ function event.Call(name, ...)
     end
 end
 
-function event.Add(name, id, fn)
+function event.Call( name, ... )
+    event.Call = Call
+    return Call(name, unpack(arg))
+end
+
+function event.Add( name, id, fn )
     subs[name] = subs[name] or {}
     subs[name][id] = fn
 end
 
-function event.Persist(name, id, fn)
+function event.Persist( name, id, fn )
     persist[name] = persist[name] or {}
     persist[name][id] = fn
 end
 
 local function nop() end
-function event.Remove(name, id)
+function event.Remove( name, id )
     if subs[name] then
         subs[name][id] = nop
     end
@@ -80,8 +85,11 @@ function event.Remove(name, id)
     hasRemove = true
 end
 
-function event.Timer(time, fn)
-    local start = os.clock()
+local clock
+local pt
+
+function event.Timer( time, fn )
+    local start = clock:GetSecsIntoEffect()
     event.Add("update",fn,function(_,now)
         if (now-start) >= time then
             event.Remove("update",fn)
@@ -90,12 +98,32 @@ function event.Timer(time, fn)
     end)
 end
 
-local pt = os.clock()
-function event:Update()
-    local time = os.clock()
+function event.PeristTimer( time, fn )
+    local start = clock:GetSecsIntoEffect()
+    event.Persist("update",fn,function(_,now)
+        if (now-start) >= time then
+            event.Remove("update",fn)
+            fn()
+        end
+    end)
+end
+
+function event.GetClock()
+    return clock:GetSecsIntoEffect()
+end
+
+local function update()
+    local time = clock:GetSecsIntoEffect()
     local dt = time - pt
     pt = time
     event.Call("update", dt, time)
+end
+
+function event:Update()
+    clock = self
+    pt = self:GetSecsIntoEffect()-0.01
+    event.Update = update
+    update(self)
 end
 
 return event

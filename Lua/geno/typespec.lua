@@ -25,6 +25,22 @@ local typespec = {
                 init( shader, template )
             end
         end,
+        FileFrag = function( template )
+            local frag = template.FileFrag
+            if frag then
+                print("RETURNING FRAG","../" .. frag)
+                return "../" .. frag
+            end
+            return 'nop.frag'
+        end,
+        FileVert = function( template )
+            local vert = template.FileVert
+            if vert then
+                print("RETURNING VERT","../" .. vert)
+                return "../" .. vert
+            end
+            return 'nop.vert'
+        end,
         On = function(actor, template)
             local on = template.OnCommand
             if type(on) == "function" then

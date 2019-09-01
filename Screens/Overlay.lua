@@ -1,13 +1,12 @@
 local Def = stitch "lua.geno".Def
 
-local env = setmetatable({Def = Def},{__index = _G})
 local function overlay(name)
-    return stitch.RequireEnv("screens.overlay." .. name, env)
+    return stitch.RequireEnv("screens.overlay." .. name, {Def = Def})
 end
 
 return Def.ActorFrame {
     overlay "music",
     overlay "clock",
     overlay "escape",
-    overlay "console"
+    Def.ActorFrame { File="/Screens/Overlay/Console/" }
 }

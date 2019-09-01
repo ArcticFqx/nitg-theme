@@ -1,5 +1,5 @@
 <ActorFrame>
 <children>
-    <Layer Name="shader" Frag="nop.frag" Vert="nop.vert" />
+    <Layer Name="shader" Frag="@stx'lua.geno'.Meta'FileFrag'" Vert="@stx'lua.geno'.Meta'FileVert'" />
 </children>
 </ActorFrame>
