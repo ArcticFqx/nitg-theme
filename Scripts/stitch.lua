@@ -9,8 +9,8 @@ if _G.stitch then
     return
 end
 
-local stitch = { 
-    _VERSION = 'Stitch 190731 dev' 
+local stitch = {
+    _VERSION = 'Stitch 1901203 dev'
 }
 
 _G.stitch = stitch
@@ -31,16 +31,16 @@ local function load(name)
         local func, err = loadfile(path)
         if func then
             hit = w .. ','
-            _G.Debug('[Loading] ' .. path)
+            Debug('[Loading] ' .. path)
             return func
         end
-        log[getn(log)+1] = '[Error] ' .. err --gsub(err,'\n.+','')
+        log[getn(log)+1] = '[Error] ' .. err
     end
 
     for i=1, getn(log) do
-        if not find(log[i], 'cannot read') then _G.Debug(log[i]) return end
+        if not find(log[i], 'cannot read') then Debug(log[i]) return end
     end
-    _G.Debug(log[1])
+    Debug(log[1])
 end
 
 function stitch.nocache( name, env, ... )
@@ -63,11 +63,15 @@ end
 
 function stitch.RequireEnv(name, env, ...)
     name = lower(name)
+
     if requireCache[name] then
         return unpack(requireCache[name])
     end
+    requireCache[name] = {}
+
     local func = load(name)
     if not func then
+        requireCache[name] = nil
         return
     end
 
@@ -93,8 +97,8 @@ end
 
 setmetatable(stitch, stitch)
 
-_G.Trace '[Stitch] Initialized!'
-_G.Trace('[Stitch] We are on version "' .. stitch._VERSION .. '"')
+Trace '[Stitch] Initialized!'
+Trace('[Stitch] We are on version "' .. stitch._VERSION .. '"')
 
 -- Preload config
 local config = setmetatable({},{})
