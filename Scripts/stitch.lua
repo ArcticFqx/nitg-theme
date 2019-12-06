@@ -10,7 +10,7 @@ if _G.stitch then
 end
 
 local stitch = {
-    _VERSION = 'Stitch 1901203 dev'
+    _VERSION = 'Stitch 191203 dev'
 }
 
 _G.stitch = stitch
